@@ -22,7 +22,9 @@ pub fn process_data(
     text_to_be_replaced: &str,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let data = delete_entire_line(&data, &text_to_be_replaced);
-    let data = data.replace(". ", ".");
+    let data = data.replace(". ", ".\n");
+    // let data = insert_blank_spaces(&data);
+
     let mut inside_braces = false;
     let mut new_text = String::new();
 
@@ -57,4 +59,31 @@ pub fn process_data(
     }
 
     Ok(new_text)
+}
+
+#[allow(dead_code)]
+pub fn insert_blank_spaces(text: &str) -> String {
+    let mut result = String::new();
+    let lines: Vec<&str> = text.lines().collect();
+
+    for i in 0..lines.len() {
+        let current_line = lines[i].trim();
+        result.push_str(current_line);
+
+        let next_line_index = i + 1;
+        if next_line_index < lines.len() {
+            let next_line = lines[next_line_index].trim();
+
+            if current_line.ends_with('.') && next_line.ends_with('.') {
+                result.push('\n');
+                result.push('\n');
+            } else {
+                result.push(' ');
+            }
+        } else {
+            result.push('\n');
+        }
+    }
+
+    result
 }
