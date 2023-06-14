@@ -10,7 +10,10 @@ pub fn read_input_file(input_file: &str) -> Result<String, Box<dyn std::error::E
     Ok(data)
 }
 
-pub fn write_output_file(output_file: &Path, new_text: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn write_output_file(
+    output_file: &Path,
+    new_text: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let file = File::create(output_file)?;
     let mut buf_writer = BufWriter::new(file);
     buf_writer.write_all(new_text.as_bytes())?;

@@ -22,7 +22,7 @@ pub fn process_data(
     text_to_be_replaced: &str,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let data = delete_entire_line(&data, &text_to_be_replaced);
-    let data = data.replace(". ", ".\n");
+    let data = data.replace(". ", ".");
     let mut inside_braces = false;
     let mut new_text = String::new();
 
@@ -45,6 +45,7 @@ pub fn process_data(
                             && !is_symbol(next_char)
                         {
                             new_text.push('\n');
+                            // new_text.push('\n');
                         }
                     }
                 }
@@ -57,4 +58,3 @@ pub fn process_data(
 
     Ok(new_text)
 }
-

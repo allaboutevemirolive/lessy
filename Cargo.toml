@@ -6,3 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+
+[dev-dependencies]
+# Add the dev dependencies used for testing here
+
+[[bin]]
+name = "your_binary_name"
+path = "src/main.rs"
+
+[[test]]
+name = "your_test_module_name"
+path = "tests/tests.rs"

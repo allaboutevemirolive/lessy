@@ -1,8 +1,8 @@
-pub mod file_utils;
 pub mod data_processing;
+pub mod file_utils;
 
-use file_utils::{format_output_file_name, read_input_file, write_output_file};
 use data_processing::process_data;
+use file_utils::{format_output_file_name, read_input_file, write_output_file};
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let input_file = "input.txt";
