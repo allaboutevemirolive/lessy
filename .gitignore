@@ -10,3 +10,5 @@ target/
 # Ignore rust config files
 Cargo.toml
 Cargo.lock
+
+output.md
