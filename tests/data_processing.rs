@@ -1,9 +1,10 @@
-
+/// Check if the character is a symbol.
 pub fn is_symbol(c: char) -> bool {
     let symbols = "/\\:*?\"<>|!@#$%^&()-+=[]{};,.\'~`";
     symbols.contains(c)
 }
 
+/// Delete entire lines containing the specified text.
 pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     let mut new_data = String::new();
     let lines: Vec<&str> = data.split('\n').collect();
@@ -18,13 +19,10 @@ pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     new_data
 }
 
-pub fn process_data(
-    data: &str,
-    text_to_be_replaced: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
+/// Process the data by deleting lines, replacing text, and adding newlines.
+pub fn process_data(data: &str, text_to_be_replaced: &str) -> Result<String, Box<dyn std::error::Error>> {
     let data = delete_entire_line(&data, &text_to_be_replaced);
     let data = data.replace(". ", ".\n");
-    // let data = insert_blank_spaces(&data);
 
     let mut inside_braces = false;
     let mut new_text = String::new();
@@ -48,7 +46,6 @@ pub fn process_data(
                             && !is_symbol(next_char)
                         {
                             new_text.push('\n');
-                            // new_text.push('\n');
                         }
                     }
                 }
@@ -62,29 +59,29 @@ pub fn process_data(
     Ok(new_text)
 }
 
-#[allow(dead_code)]
-pub fn insert_blank_spaces(text: &str) -> String {
-    let mut result = String::new();
-    let lines: Vec<&str> = text.lines().collect();
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    for i in 0..lines.len() {
-        let current_line = lines[i].trim();
-        result.push_str(current_line);
-
-        let next_line_index = i + 1;
-        if next_line_index < lines.len() {
-            let next_line = lines[next_line_index].trim();
-
-            if current_line.ends_with('.') && next_line.ends_with('.') {
-                result.push('\n');
-                result.push('\n');
-            } else {
-                result.push(' ');
-            }
-        } else {
-            result.push('\n');
-        }
+    #[test]
+    fn test_is_symbol() {
+        assert!(is_symbol('$'));
+        assert!(!is_symbol('a'));
     }
 
-    result
+    #[test]
+    fn test_delete_entire_line() {
+        let data = "Line 1\nLine 2\nLine 3\n";
+        let text_to_be_deleted = "Line 2";
+        let expected_result = "Line 1\nLine 3\n";
+        assert_eq!(delete_entire_line(data, text_to_be_deleted), expected_result);
+    }
+
+    #[test]
+    fn test_process_data() {
+        let data = "Hello. This is a test.";
+        let text_to_be_replaced = "This is";
+        let expected_result = "Hello.\nThis is a test.";
+        assert_eq!(process_data(data, text_to_be_replaced).unwrap(), expected_result);
+    }
 }

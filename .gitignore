@@ -1,0 +1,12 @@
+# Ignore compiled binaries and build artifacts
+target/
+*.exe
+*.o
+
+# Ignore IDE and editor-specific files
+.idea/
+.vscode/
+
+# Ignore rust config files
+Cargo.toml
+Cargo.lock
