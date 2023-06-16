@@ -13,7 +13,7 @@ Cargo.lock
 
 output/
 
-# Personal code 
+# Personal folder 
 experiment/
-
 references/
+code_explanation/
