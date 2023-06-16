@@ -1,0 +1,67 @@
+use std::fs::File;
+use std::io::{BufReader, BufWriter, Read, Write};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    let input_file     = "input.txt";
+    let output_file    = "11.1. How to Write Tests.md";
+    let output_file = format_output_file_name(output_file);
+
+    let data = read_input_file(input_file).expect("Unable to read input file");
+    let new_text = process_data(&data);
+
+    write_output_file(&output_file, &new_text).expect("Unable to write to output file");
+}
+
+fn format_output_file_name(output_file: &str) -> PathBuf {
+    let output_file = output_file.replace(" ", "_").to_lowercase();
+    Path::new(&output_file).to_path_buf()
+}
+
+fn read_input_file(input_file: &str) -> std::io::Result<String> {
+    let file = File::open(input_file)?;
+    let mut buf_reader = BufReader::new(file);
+    let mut data = String::new();
+    buf_reader.read_to_string(&mut data)?;
+    Ok(data)
+}
+
+fn process_data(data: &str) -> String {
+    let data = data.replace(". ", ".\n");
+    let mut inside_braces = false;
+    let mut new_text = String::new();
+
+    let mut data_chars = data.chars().peekable();
+    while let Some(c) = data_chars.next() {
+        if c == '{' {
+            inside_braces = true;
+            new_text.push(c);
+        } else if c == '}' {
+            inside_braces = false;
+            new_text.push(c);
+        } else if !inside_braces {
+            match c {
+                '.' => {
+                    new_text.push('.');
+                    if let Some(&next_char) = data_chars.peek() {
+                        if !next_char.is_ascii_lowercase() && !next_char.is_digit(10) {
+                            new_text.push('\n');
+                        }
+                    }
+                }
+                _ => new_text.push(c),
+            }
+        } else {
+            new_text.push(c);
+        }
+    }
+
+    new_text
+}
+
+fn write_output_file(output_file: &Path, new_text: &str) -> std::io::Result<()> {
+    let file = File::create(output_file)?;
+    let mut buf_writer = BufWriter::new(file);
+    buf_writer.write_all(new_text.as_bytes())?;
+    Ok(())
+}
