@@ -1,40 +1,35 @@
-# lessy
-Say Goodbye to Complex Texts and Hello to Clear and Understandable Reading
+# Lessy
+
+Lessy is a Rust library for text processing and manipulation. It simplify concatenated sentences into easily readable sentences, enhancing comprehension through the addition of blank spaces between each sentence.
+
+## Features
+
+- **Insert Blank Spaces:** Insert blank spaces in the text for improved readability or formatting.
+- **Line Deletion:** Delete entire lines from the text based on specific criteria.
+- **Specific Word Delection**
+- **Regex Detection**
+- **Text Processing:** Perform custom text processing operations such as replacing text, splitting sentences, and more.
+
+## Notes
+
+Lessy is still in its early stages, but you can get the most out of it. The coding is straightforward, and you may begin by running the command 'cargo init' and then navigate to the src folder.
 
 
-## What is Lessy?
+## Contributing
 
-lol
+Contributions are welcome! If you have any ideas, improvements, or bug fixes, please open an issue or submit a pull request. 
 
+## License
 
-Execute the following command to create additional files:
+This project is licensed under the [MIT License](LICENSE).
 
-```
-cargo init
-```
+## Acknowledgements
 
+Lessy was inspired by the need for text processing tools in various projects. We thank the open-source community for their contributions and the Rust programming language for providing a robust and efficient platform for building such tools.
 
-Type the following data into the Cargo.toml file:
+## Contact
 
-```md
-[package]
-name = "lessy"
-version = "0.1.0"
-edition = "2021"
+For any inquiries or questions, please contact us at [akmal.fir010@gmail.com](akmal.fir010@gmail.com).
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+---
 
-[dependencies]
-
-
-[dev-dependencies]
-# Add the dev dependencies used for testing here
-
-[[bin]]
-name = "main_function"
-path = "src/main.rs"
-
-[[test]]
-name = "test_case"
-path = "tests/tests.rs"
-```
