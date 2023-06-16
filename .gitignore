@@ -12,3 +12,8 @@ Cargo.toml
 Cargo.lock
 
 output/
+
+# Personal code 
+experiment/
+
+references/

@@ -1,3 +1,4 @@
+use regex::Regex;
 
 pub fn is_symbol(c: char) -> bool {
     let symbols = "/\\:*?\"<>|!@#$%^&()-+=[]{};,.\'~`";
@@ -18,11 +19,45 @@ pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     new_data
 }
 
+pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String {
+    let mut new_data = String::new();
+    let lines: Vec<&str> = data.split('\n').collect();
+
+    let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
+
+    for line in lines {
+        let mut modified_line = String::new();
+        let line_without_brackets = re_words.replace_all(line, "");
+
+        for word in line_without_brackets.split(' ') {
+            modified_line.push_str(word);
+            modified_line.push(' ');
+        }
+
+        // Remove trailing whitespace
+        modified_line.pop();
+
+        new_data.push_str(&modified_line);
+        new_data.push(' ');
+    }
+
+    // Remove trailing whitespace and extra space before newline
+    new_data = new_data.trim_end().replace(" \n", "\n").to_string();
+
+    new_data
+}
+
 pub fn process_data(
     data: &str,
     text_to_be_replaced: &str,
+    words_to_delete: &[&str]
 ) -> Result<String, Box<dyn std::error::Error>> {
+    let data = delete_specific_words(&data, &words_to_delete);
     let data = delete_entire_line(&data, &text_to_be_replaced);
+    
+    // Remove double trail white space to avoid making new paragraph with with extra space
+    let data = data.replace("   ", " ");
+    let data = data.replace("  ", " ");
     let data = data.replace(". ", ".\n");
     // let data = insert_blank_spaces(&data);
 
