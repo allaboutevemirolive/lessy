@@ -15,7 +15,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         // r"The availability of a high-level"
         // r"separator"
     ]; 
-
+    // Feature that will be add:
+    // - Format string containing symbol that cannot be use in file creation
     let output_file = format_output_file_name(output_file)?;
 
     let data = read_input_file(input_file)?;
