@@ -148,3 +148,11 @@ pub fn insert_blank_spaces(text: &str) -> String {
 
     result
 }
+
+
+// Before format the sentence or text, check if there is blank space in the text
+// as it is indicator for new paragraph.
+// If it is, replace the parapraph with 3 paragraph between it is "---"
+// Example: "\n" replace with "\n---\n"
+// The purpose is that to separate first the original paragraph 
+// and to know when is the end of current paragraph for the current separated text
