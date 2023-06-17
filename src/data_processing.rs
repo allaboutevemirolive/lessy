@@ -1,10 +1,12 @@
 use regex::Regex;
 
+// If the char after current dot sign is a symbol, then don't create a new blank space
 pub fn is_symbol(c: char) -> bool {
     let symbols = "/\\:*?\"<>|!@#$%^&()-+=[]{};,.\'~`";
     symbols.contains(c)
 }
 
+// Delete entire line the contain the current the current sentence/word
 pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     let mut new_data = String::new();
     let lines: Vec<&str> = data.split('\n').collect();
@@ -19,6 +21,7 @@ pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     new_data
 }
 
+// Delete specific word with regex
 pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String {
     let mut new_data = String::new();
     let lines: Vec<&str> = data.split('\n').collect();
@@ -47,6 +50,7 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
     new_data
 }
 
+// Main string processor
 pub fn process_data(
     data: &str,
     text_to_be_replaced: &str,
@@ -55,10 +59,11 @@ pub fn process_data(
     let data = delete_specific_words(&data, &words_to_delete);
     let data = delete_entire_line(&data, &text_to_be_replaced);
     
-    // Remove double trail white space to avoid making new paragraph with with extra space
+    // Remove double/triple trail white space to avoid making new paragraph with with extra space
     let data = data.replace("   ", " ");
     let data = data.replace("  ", " ");
     let data = data.replace(". ", ".\n");
+
     // let data = insert_blank_spaces(&data);
 
     let mut inside_braces = false;
@@ -66,6 +71,8 @@ pub fn process_data(
 
     let mut data_chars = data.chars().peekable();
     while let Some(c) = data_chars.next() {
+        // For sentence/word that is inside open and close curly braces, 
+        // do not format it.
         if c == '{' {
             inside_braces = true;
             new_text.push(c);
@@ -77,13 +84,20 @@ pub fn process_data(
                 '.' => {
                     new_text.push('.');
                     if let Some(&next_char) = data_chars.peek() {
+                        // After dot sign, next char is:
+                        // - digit
+                        // - also dot sign
+                        // - contains symbol(e.g "./")
+
+                        // Future feature should be add:
+                        // - for current dot sign, if the char before and after it is Uppercase. E.g "S.R/M.R"
+                        // - A list of word that should not be process by the code since it has meaning in it.
                         if !next_char.is_lowercase()
                             && !next_char.is_digit(10)
                             && next_char != '.'
                             && !is_symbol(next_char)
                         {
                             new_text.push('\n');
-                            // new_text.push('\n');
                         }
                     }
                 }
@@ -97,6 +111,16 @@ pub fn process_data(
     Ok(new_text)
 }
 
+// There is a time that the code wont make a blank space between 2 sentences. 
+// It because the next sentence is underly the current sentence, not attach to current sentence.
+// In order to fix this, code need to detect:
+// - If current line contains dot sign at the end of it
+// - The sentence underly the current sentence, has dot sign at the end of it
+// - If both requirements is meet then separate both sentence with a blank space
+//
+// One main problem is that, the code need to distint between 
+// - sentence that end with dot sign is "sentence" 
+// - sentence that end with dot sign is not a "sentence" e.g snippet contains dot sign
 #[allow(dead_code)]
 pub fn insert_blank_spaces(text: &str) -> String {
     let mut result = String::new();
