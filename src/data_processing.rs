@@ -92,7 +92,7 @@ pub fn process_data(
 
                         // Future feature should be add:
                         // - for current dot sign, if the char before and after it is Uppercase. E.g "S.R/M.R"
-                        // - A list of word that should not be process by the code since it has meaning in it.
+                        // - A list of word that should not be format by the code since it has meaning in it.
                         if !next_char.is_lowercase()
                             && !next_char.is_digit(10)
                             && next_char != '.'
