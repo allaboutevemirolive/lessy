@@ -9,15 +9,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let output_file = "output.md";
     let text_to_be_replaced = "Click here to view code image";
 
+    // Insert multiple regex expressions here
     let words_to_delete = &[
-        r#"\[[0-9]+\]"#,
-        r"The availability of a high-level"
+        r#"\[[0-9]+\]"#
+        // r"The availability of a high-level"
         // r"separator"
-    ]; // Insert multiple regex expressions here
+    ]; 
 
     let output_file = format_output_file_name(output_file)?;
 
-    
     let data = read_input_file(input_file)?;
     let new_text = process_data(&data, &text_to_be_replaced, words_to_delete)?;
     

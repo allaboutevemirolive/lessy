@@ -4,7 +4,7 @@ First released in 1971, Unix was written entirely in assembly language, as was c
 
 In 1973, in a key pioneering approach, it was rewritten in the C programming language by Dennis Ritchie (with the exception of some hardware and I/O routines).
 
-language implementation of Unix made its porting to different computer platforms easier.
+The availability of a high-level language implementation of Unix made its porting to different computer platforms easier.
 
 Due to an earlier antitrust case forbidding it from entering the computer business, AT&T licensed the operating system's source code as a trade secret to anyone who asked.
 
