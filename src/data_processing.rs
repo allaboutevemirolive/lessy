@@ -73,6 +73,7 @@ pub fn process_data(
     while let Some(c) = data_chars.next() {
         // For sentence/word that is inside open and close curly braces, 
         // do not format it.
+        // Probably it is snippet
         if c == '{' {
             inside_braces = true;
             new_text.push(c);
