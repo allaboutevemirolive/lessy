@@ -29,6 +29,7 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
     let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
 
     for line in lines {
+
         let mut modified_line = String::new();
         let line_without_brackets = re_words.replace_all(line, "");
 
@@ -41,7 +42,7 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
         modified_line.pop();
 
         new_data.push_str(&modified_line);
-        new_data.push(' ');
+        new_data.push('\n');
     }
 
     // Remove trailing whitespace and extra space before newline
