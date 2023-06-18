@@ -22,7 +22,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let data = read_input_file(input_file)?;
     let new_text = process_data(&data, &text_to_be_replaced, words_to_delete)?;
     
-    // let new_text = insert_blank_spaces(&new_text);
+    let new_text = insert_blank_spaces(&new_text);
 
     write_output_file(&output_file, &new_text)?;
 

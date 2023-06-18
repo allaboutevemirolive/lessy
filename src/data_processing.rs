@@ -69,6 +69,7 @@ pub fn process_data(
 
     let mut inside_braces = false;
     let mut new_text = String::new();
+    let mut prev_char = 'a';
 
     let mut data_chars = data.chars().peekable();
     while let Some(c) = data_chars.next() {
@@ -98,12 +99,21 @@ pub fn process_data(
                             && !next_char.is_digit(10)
                             && next_char != '.'
                             && !is_symbol(next_char)
+                            && (
+                                !prev_char.is_uppercase() && 
+                                !next_char.is_uppercase()
+                            )
                         {
                             new_text.push('\n');
                         }
                     }
+                    prev_char = c;
                 }
-                _ => new_text.push(c),
+                _ => {
+                    new_text.push(c);
+                    prev_char = c;
+                }
+
             }
         } else {
             new_text.push(c);
@@ -123,31 +133,65 @@ pub fn process_data(
 // One main problem is that, the code need to distint between 
 // - sentence that end with dot sign is "sentence" 
 // - sentence that end with dot sign is not a "sentence" e.g snippet contains dot sign
-#[allow(dead_code)]
+// #[allow(dead_code)]
 pub fn insert_blank_spaces(text: &str) -> String {
     let mut result = String::new();
+
+    // clone so
+    let lines_clone: Vec<&str> = text.clone().lines().collect();
+
     let lines: Vec<&str> = text.lines().collect();
 
-    for i in 0..lines.len() {
-        let current_line = lines[i].trim();
-        result.push_str(current_line);
+    for i in 0..(lines.len() - 1) {
+        // trim cloned vector
+        let current_line = lines_clone[i].trim();
+        let next_line = lines_clone[ i + 1 ].trim();
 
-        let next_line_index = i + 1;
-        if next_line_index < lines.len() {
-            let next_line = lines[next_line_index].trim();
-
-            if current_line.ends_with('.') && next_line.ends_with('.') {
-                result.push('\n');
-                result.push('\n');
-            } else {
-                result.push(' ');
-            }
-        } else {
-            result.push('\n');
+        // if starts_with_uppercase(current_line) 
+        // && ends_with_dot_sign(current_line) {
+        //     if starts_with_uppercase(next_line) 
+        //     && ends_with_dot_sign(next_line) {
+        //         // In Rust, you cannot directly concatenate a char and a &str using the + operator.
+        //         // To fix this, you can convert the char into a String and then use string concatenation.
+        //         // We push uncloned vector
+        //         result.push_str(&format!("{}\n\n", lines[i]));
+        //     } else {
+        //         result.push_str(&format!("{}\n", lines[i]));
+        //     }
+        // } else {
+        //     result.push_str(&format!("{}\n", lines[i]));
+        // }
+        match (starts_with_uppercase(current_line), ends_with_dot_sign(current_line)) {
+            (true, true) => {
+                match (starts_with_uppercase(next_line), ends_with_dot_sign(next_line)) {
+                    (true, true) => {
+                        result.push_str(&format!("{}\n\n", lines[i]));
+                    },
+                    _ => {
+                        result.push_str(&format!("{}\n", lines[i]));
+                    },
+                }
+            },
+            _ => {
+                result.push_str(&format!("{}\n", lines[i]));
+            },
         }
+        
     }
 
     result
+}
+
+fn starts_with_uppercase(string: &str) -> bool {
+    if let Some(first_char) = string.chars().next() {
+        first_char.is_uppercase()
+    } else {
+        false
+    }
+}
+
+fn ends_with_dot_sign(string: &str) -> bool {
+    string.ends_with('.')
 }
 
 
