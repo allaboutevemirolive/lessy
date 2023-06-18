@@ -67,7 +67,12 @@ fn test_delete_specific_words() {
                          // r"separator"
     ];
 
-    let expected_result = "1. The sky is blue. 2. Dogs bark loudly. 3. Time flies quickly. 4. Rain falls softly. 5. Birds sing sweetly.";
+    let expected_result = "\
+1. The sky is blue.
+2. Dogs bark loudly.
+3. Time flies quickly.
+4. Rain falls softly.
+5. Birds sing sweetly.";
 
     let result = delete_specific_words(input_1, words_to_delete);
 

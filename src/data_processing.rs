@@ -65,8 +65,6 @@ pub fn process_data(
     let data = data.replace("  ", " ");
     let data = data.replace(". ", ".\n");
 
-    // let data = insert_blank_spaces(&data);
-
     let mut inside_braces = false;
     let mut new_text = String::new();
     let mut prev_char = 'a';
@@ -137,15 +135,16 @@ pub fn process_data(
 pub fn insert_blank_spaces(text: &str) -> String {
     let mut result = String::new();
 
-    // clone so
+    // trim cloned vector 
     let lines_clone: Vec<&str> = text.clone().lines().collect();
 
-    let lines: Vec<&str> = text.lines().collect();
+    // Original vector
+    let lines_original: Vec<&str> = text.lines().collect();
 
-    for i in 0..(lines.len() - 1) {
+    for i in 0..(lines_original.len() - 1) {
         // trim cloned vector
-        let current_line = lines_clone[i].trim();
-        let next_line = lines_clone[ i + 1 ].trim();
+        let current_line_clone = lines_clone[i].trim();
+        let next_line_cloned = lines_clone[ i + 1 ].trim();
 
         // if starts_with_uppercase(current_line) 
         // && ends_with_dot_sign(current_line) {
@@ -161,19 +160,25 @@ pub fn insert_blank_spaces(text: &str) -> String {
         // } else {
         //     result.push_str(&format!("{}\n", lines[i]));
         // }
-        match (starts_with_uppercase(current_line), ends_with_dot_sign(current_line)) {
+        match (
+            starts_with_uppercase(current_line_clone), 
+            ends_with_dot_sign(current_line_clone)) 
+            {
             (true, true) => {
-                match (starts_with_uppercase(next_line), ends_with_dot_sign(next_line)) {
+                match (
+                    starts_with_uppercase(next_line_cloned), 
+                    ends_with_dot_sign(next_line_cloned)) 
+                    {
                     (true, true) => {
-                        result.push_str(&format!("{}\n\n", lines[i]));
+                        result.push_str(&format!("{}\n\n", lines_original[i]));
                     },
                     _ => {
-                        result.push_str(&format!("{}\n", lines[i]));
+                        result.push_str(&format!("{}\n", lines_original[i]));
                     },
                 }
             },
             _ => {
-                result.push_str(&format!("{}\n", lines[i]));
+                result.push_str(&format!("{}\n", lines_original[i]));
             },
         }
         
@@ -201,3 +206,7 @@ fn ends_with_dot_sign(string: &str) -> bool {
 // Example: "\n" replace with "\n---\n"
 // The purpose is that to separate first the original paragraph 
 // and to know when is the end of current paragraph for the current separated text
+
+// fn seprator_two_paragraph(text: &str) -> String {
+//     text
+// }
