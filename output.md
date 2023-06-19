@@ -1,156 +1,337 @@
-Precursors
+Controlling How Tests Are Run
+Just as cargo run compiles your code and then runs the resulting binary, cargo test compiles your code in test mode and runs the resulting test binary.
 
-Linus Torvalds, principal author of the Linux kernel
-The Unix operating system was conceived and implemented in 1969, at AT&T's Bell Labs, in the United States by Ken Thompson, Dennis Ritchie, Douglas McIlroy, and Joe Ossanna.
+The default behavior of the binary produced by cargo test is to run all the tests in parallel and capture output generated during test runs, preventing the output from being displayed and making it easier to read the output related to the test results.
 
-First released in 1971, Unix was written entirely in assembly language, as was common practice at the time.
+You can, however, specify command line options to change this default behavior.
 
-In 1973, in a key pioneering approach, it was rewritten in the C programming language by Dennis Ritchie (with the exception of some hardware and I/O routines).
 
-The availability of a high-level language implementation of Unix made its porting to different computer platforms easier.
 
+Some command line options go to cargo test, and some go to the resulting test binary.
 
+To separate these two types of arguments, you list the arguments that go to cargo test followed by the separator -- and then the ones that go to the test binary.
 
-Due to an earlier antitrust case forbidding it from entering the computer business, AT&T licensed the operating system's source code as a trade secret to anyone who asked.
+Running cargo test --help displays the options you can use with cargo test, and running cargo test -- --help displays the options you can use after the separator.
 
-As a result, Unix grew quickly and became widely adopted by academic institutions and businesses.
 
-In 1984, AT&T divested itself of its regional operating companies, and was released from its obligation not to enter the computer business; freed of that obligation, Bell Labs began selling Unix as a proprietary product, where users were not legally allowed to modify it.
 
+Running Tests in Parallel or Consecutively
+When you run multiple tests, by default they run in parallel using threads, meaning they finish running faster and you get feedback quicker.
 
+Because the tests are running at the same time, you must make sure your tests don’t depend on each other or on any shared state, including a shared environment, such as the current working directory or environment variables.
 
-Onyx Systems began selling early microcomputer-based Unix workstations in 1980.
 
-Later, Sun Microsystems, founded as a spin-off of a student project at Stanford University, also began selling Unix-based desktop workstations in 1982.
 
-While Sun workstations did not utilize commodity PC hardware, for which Linux was later originally developed, it represented the first successful commercial attempt at distributing a primarily single-user microcomputer that ran a Unix operating system.
+For example, say each of your tests runs some code that creates a file on disk named test-output.txt and writes some data to that file.
 
+Then each test reads the data in that file and asserts that the file contains a particular value, which is different in each test.
 
+Because the tests run at the same time, one test might overwrite the file in the time between another test writing and reading the file.
 
-With Unix increasingly "locked in" as a proprietary product, the GNU Project, started in 1983 by Richard Stallman, had the goal of creating a "complete Unix-compatible software system" composed entirely of free software.
+The second test will then fail, not because the code is incorrect but because the tests have interfered with each other while running in parallel.
 
-Work began in 1984.
+One solution is to make sure each test writes to a different file; another solution is to run the tests one at a time.
 
-Later, in 1985, Stallman started the Free Software Foundation and wrote the GNU General Public License (GNU GPL) in 1989.
 
-By the early 1990s, many of the programs required in an operating system (such as libraries, compilers, text editors, a command-line shell, and a windowing system) were completed, although low-level elements such as device drivers, daemons, and the kernel, called GNU Hurd, were stalled and incomplete.
 
+If you don’t want to run the tests in parallel or if you want more fine-grained control over the number of threads used, you can send the --test-threads flag and the number of threads you want to use to the test binary.
 
+Take a look at the following example:
 
-MINIX was created by Andrew S.Tanenbaum, a computer science professor, and released in 1987 as a minimal Unix-like operating system targeted at students and others who wanted to learn operating system principles.
+$ cargo test -- --test-threads=1
+We set the number of test threads to 1, telling the program not to use any parallelism.
 
-Although the complete source code of MINIX was freely available, the licensing terms prevented it from being free software until the licensing changed in April 2000.
+Running the tests using one thread will take longer than running them in parallel, but the tests won’t interfere with each other if they share state.
 
 
 
-Although not released until 1992, due to legal complications, development of 386BSD, from which NetBSD, OpenBSD and FreeBSD descended, predated that of Linux.
+Showing Function Output
+By default, if a test passes, Rust’s test library captures anything printed to standard output.
 
+For example, if we call println! in a test and the test passes, we won’t see the println! output in the terminal; we’ll see only the line that indicates the test passed.
 
+If a test fails, we’ll see whatever was printed to standard output with the rest of the failure message.
 
-Linus Torvalds has stated on separate occasions that if the GNU kernel or 386BSD had been available at the time (1991), he probably would not have created Linux.
 
 
+As an example, Listing 11-10 has a silly function that prints the value of its parameter and returns 10, as well as a test that passes and a test that fails.
 
-Creation
-While attending the University of Helsinki in the fall of 1990, Torvalds enrolled in a Unix course.
 
-The course utilized a MicroVAX minicomputer running Ultrix, and one of the required texts was Operating Systems: Design and Implementation by Andrew S.Tanenbaum.
 
-This textbook included a copy of Tanenbaum's MINIX operating system.
+Filename: src/lib.rs
 
-It was with this course that Torvalds first became exposed to Unix.
+This code panics!
+fn prints_and_returns_10(a: i32) -> i32 {
+    println!("I got the value {}", a);
+    10
+}
 
-In 1991, he became curious about operating systems.
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-Frustrated by the licensing of MINIX, which at the time limited it to educational use only, he began to work on his own operating system kernel, which eventually became the Linux kernel.
+    #[test]
+    fn this_test_will_pass() {
+        let value = prints_and_returns_10(4);
+        assert_eq!(10, value);
+    }
 
+    #[test]
+    fn this_test_will_fail() {
+        let value = prints_and_returns_10(8);
+        assert_eq!(5, value);
+    }
+}
+Listing 11-10: Tests for a function that calls println!
 
+When we run these tests with cargo test, we’ll see the following output:
 
-On July 3, 1991, in an effort to implement Unix system calls, Linus Torvalds attempted to obtain a digital copy of the POSIX standards documentation with a request to the comp.os.minix newsgroup.
+$ cargo test
+   Compiling silly-function v0.1.0 (file:///projects/silly-function)
+    Finished test [unoptimized + debuginfo] target(s) in 0.58s
+     Running unittests src/lib.rs (target/debug/deps/silly_function-160869f38cff9166)
 
-After unsuccessfully finding the POSIX documentation, Torvalds initially resorted to determining system calls from SunOS documentation owned by the university for use in operating its Sun Microsystems server.
+running 2 tests
+test tests::this_test_will_fail ...
 
-He also learned some system calls from Tenenbaum's MINIX text.
+FAILED
+test tests::this_test_will_pass ...ok
 
+failures:
 
+---- tests::this_test_will_fail stdout ----
+I got the value 8
+thread 'tests::this_test_will_fail' panicked at 'assertion failed: `(left == right)`
+  left: `5`,
+ right: `10`', src/lib.rs:19:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
-Torvalds began the development of the Linux kernel on MINIX and applications written for MINIX were also used on Linux.
 
-Later, Linux matured and further Linux kernel development took place on Linux systems.
+failures:
+    tests::this_test_will_fail
 
-GNU applications also replaced all MINIX components, because it was advantageous to use the freely available code from the GNU Project with the fledgling operating system; code licensed under the GNU GPL can be reused in other computer programs as long as they also are released under the same or a compatible license.
+test result: FAILED.1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-Torvalds initiated a switch from his original license, which prohibited commercial redistribution, to the GNU GPL.Developers worked to integrate GNU components with the Linux kernel, creating a fully functional and free operating system.
+error: test failed, to rerun pass `--lib`
+Note that nowhere in this output do we see I got the value 4, which is what is printed when the test that passes runs.
 
+That output has been captured.
 
+The output from the test that failed, I got the value 8, appears in the section of the test summary output, which also shows the cause of the test failure.
 
-Naming
 
-5.25-inch floppy disks holding a very early version of Linux
-Linus Torvalds had wanted to call his invention "Freax", a portmanteau of "free", "freak", and "x" (as an allusion to Unix).
 
-During the start of his work on the system, some of the project's makefiles included the name "Freax" for about half a year.
+If we want to see printed values for passing tests as well, we can tell Rust to also show the output of successful tests with --show-output.
 
-Initially, Torvalds considered the name "Linux" but dismissed it as too egotistical.
 
 
+$ cargo test -- --show-output
+When we run the tests in Listing 11-10 again with the --show-output flag, we see the following output:
 
-To facilitate development, the files were uploaded to the FTP server (ftp.funet.fi) of FUNET in September 1991.
+$ cargo test -- --show-output
+   Compiling silly-function v0.1.0 (file:///projects/silly-function)
+    Finished test [unoptimized + debuginfo] target(s) in 0.60s
+     Running unittests src/lib.rs (target/debug/deps/silly_function-160869f38cff9166)
 
-Ari Lemmke, Torvalds' coworker at the Helsinki University of Technology (HUT) who was one of the volunteer administrators for the FTP server at the time, did not think that "Freax" was a good name, so he named the project "Linux" on the server without consulting Torvalds.
+running 2 tests
+test tests::this_test_will_fail ...
 
-Later, however, Torvalds consented to "Linux".
+FAILED
+test tests::this_test_will_pass ...ok
 
+successes:
 
+---- tests::this_test_will_pass stdout ----
+I got the value 4
 
-According to a newsgroup post by Torvalds, the word "Linux" should be pronounced (/ˈlɪnʊks/ (listen) LIN-uuks) with a short 'i' as in 'print' and 'u' as in 'put'.
 
-To further demonstrate how the word "Linux" should be pronounced, he included an audio guide with the kernel source code.
+successes:
+    tests::this_test_will_pass
 
-However, in this recording, he pronounces Linux as /ˈlinʊks/ (LEEN-uuks) with a short but close front unrounded vowel, instead of a near-close near-front unrounded vowel as in his newsgroup post.
+failures:
 
+---- tests::this_test_will_fail stdout ----
+I got the value 8
+thread 'tests::this_test_will_fail' panicked at 'assertion failed: `(left == right)`
+  left: `5`,
+ right: `10`', src/lib.rs:19:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 
-Commercial and popular uptake
-Main article: Linux adoption
+failures:
+    tests::this_test_will_fail
 
-Ubuntu, a popular Linux distribution
+test result: FAILED.1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-Nexus 5X running Android
-Adoption of Linux in production environments, rather than being used only by hobbyists, started to take off first in the mid-1990s in the supercomputing community, where organizations such as NASA started to replace their increasingly expensive machines with clusters of inexpensive commodity computers running Linux.
+error: test failed, to rerun pass `--lib`
+Running a Subset of Tests by Name
+Sometimes, running a full test suite can take a long time.
 
-Commercial use began when Dell and IBM, followed by Hewlett-Packard, started offering Linux support to escape Microsoft's monopoly in the desktop operating system market.
+If you’re working on code in a particular area, you might want to run only the tests pertaining to that code.
 
+You can choose which tests to run by passing cargo test the name or names of the test(s) you want to run as an argument.
 
 
-Today, Linux systems are used throughout computing, from embedded systems to virtually all supercomputers, and have secured a place in server installations such as the popular LAMP application stack.
 
-Use of Linux distributions in home and enterprise desktops has been growing.
+To demonstrate how to run a subset of tests, we’ll first create three tests for our add_two function, as shown in Listing 11-11, and choose which ones to run.
 
-Linux distributions have also become popular in the netbook market, with many devices shipping with customized Linux distributions installed, and Google releasing their own ChromeOS designed for netbooks.
 
 
+Filename: src/lib.rs
 
-Linux's greatest success in the consumer market is perhaps the mobile device market, with Android being the dominant operating system on smartphones and very popular on tablets and, more recently, on wearables.
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
 
-Linux gaming is also on the rise with Valve showing its support for Linux and rolling out SteamOS, its own gaming-oriented Linux distribution, which was later implemented in their Steam Deck platform.
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-Linux distributions have also gained popularity with various local and national governments, such as the federal government of Brazil.
+    #[test]
+    fn add_two_and_two() {
+        assert_eq!(4, add_two(2));
+    }
 
+    #[test]
+    fn add_three_and_two() {
+        assert_eq!(5, add_two(3));
+    }
 
+    #[test]
+    fn one_hundred() {
+        assert_eq!(102, add_two(100));
+    }
+}
+Listing 11-11: Three tests with three different names
 
-Current development
+If we run the tests without passing any arguments, as we saw earlier, all the tests will run in parallel:
 
-In-flight entertainment system booting up displaying the Linux logo
-Greg Kroah-Hartman is the lead maintainer for the Linux kernel and guides its development.
+$ cargo test
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.62s
+     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
 
-William John Sullivan is the executive director of the Free Software Foundation, which in turn supports the GNU components.
+running 3 tests
+test tests::add_three_and_two ...ok
+test tests::add_two_and_two ...ok
+test tests::one_hundred ...ok
 
-Finally, individuals and corporations develop third-party non-GNU components.
+test result: ok.3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-These third-party components comprise a vast body of work and may include both kernel modules and user applications and libraries.
+   Doc-tests adder
 
+running 0 tests
 
+test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-Linux vendors and communities combine and distribute the kernel, GNU components, and non-GNU components, with additional package management software in the form of Linux distributions.
+Running Single Tests
+We can pass the name of any test function to cargo test to run only that test:
+
+$ cargo test one_hundred
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.69s
+     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+
+running 1 test
+test tests::one_hundred ...ok
+
+test result: ok.1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+Only the test with the name one_hundred ran; the other two tests didn’t match that name.
+
+The test output lets us know we had more tests that didn’t run by displaying 2 filtered out at the end.
+
+
+
+We can’t specify the names of multiple tests in this way; only the first value given to cargo test will be used.
+
+But there is a way to run multiple tests.
+
+
+
+Filtering to Run Multiple Tests
+We can specify part of a test name, and any test whose name matches that value will be run.
+
+For example, because two of our tests’ names contain add, we can run those two by running cargo test add:
+
+$ cargo test add
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.61s
+     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+
+running 2 tests
+test tests::add_three_and_two ...ok
+test tests::add_two_and_two ...ok
+
+test result: ok.2 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+This command ran all tests with add in the name and filtered out the test named one_hundred.
+
+Also note that the module in which a test appears becomes part of the test’s name, so we can run all the tests in a module by filtering on the module’s name.
+
+
+
+Ignoring Some Tests Unless Specifically Requested
+Sometimes a few specific tests can be very time-consuming to execute, so you might want to exclude them during most runs of cargo test.
+
+Rather than listing as arguments all tests you do want to run, you can instead annotate the time-consuming tests using the ignore attribute to exclude them, as shown here:
+
+Filename: src/lib.rs
+
+#[test]
+fn it_works() {
+    assert_eq!(2 + 2, 4);
+}
+
+#[test]
+#[ignore]
+fn expensive_test() {
+    // code that takes an hour to run
+}
+After #[test] we add the #[ignore] line to the test we want to exclude.
+
+Now when we run our tests, it_works runs, but expensive_test doesn’t:
+
+$ cargo test
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.60s
+     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+
+running 2 tests
+test expensive_test ...ignored
+test it_works ...ok
+
+test result: ok.1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests adder
+
+running 0 tests
+
+test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+The expensive_test function is listed as ignored.
+
+If we want to run only the ignored tests, we can use cargo test -- --ignored:
+
+$ cargo test -- --ignored
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.61s
+     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+
+running 1 test
+test expensive_test ...ok
+
+test result: ok.1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+   Doc-tests adder
+
+running 0 tests
+
+test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+By controlling which tests run, you can make sure your cargo test results will be fast.
+
+When you’re at a point where it makes sense to check the results of the ignored tests and you have time to wait for the results, you can run cargo test -- --ignored instead.
+
+If you want to run all tests whether they’re ignored or not, you can run cargo test -- --include-ignored.
 

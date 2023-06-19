@@ -31,5 +31,3 @@ Lessy was inspired by the need for text processing tools in various projects. We
 
 For any inquiries or questions, please contact us at [akmal.fir010@gmail.com](akmal.fir010@gmail.com).
 
----
-
