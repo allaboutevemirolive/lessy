@@ -1,3 +1,6 @@
+Precursors
+
+Linus Torvalds, principal author of the Linux kernel
 The Unix operating system was conceived and implemented in 1969, at AT&T's Bell Labs, in the United States by Ken Thompson, Dennis Ritchie, Douglas McIlroy, and Joe Ossanna.
 
 First released in 1971, Unix was written entirely in assembly language, as was common practice at the time.
@@ -45,4 +48,109 @@ Although not released until 1992, due to legal complications, development of 386
 
 
 Linus Torvalds has stated on separate occasions that if the GNU kernel or 386BSD had been available at the time (1991), he probably would not have created Linux.
+
+
+
+Creation
+While attending the University of Helsinki in the fall of 1990, Torvalds enrolled in a Unix course.
+
+The course utilized a MicroVAX minicomputer running Ultrix, and one of the required texts was Operating Systems: Design and Implementation by Andrew S.Tanenbaum.
+
+This textbook included a copy of Tanenbaum's MINIX operating system.
+
+It was with this course that Torvalds first became exposed to Unix.
+
+In 1991, he became curious about operating systems.
+
+Frustrated by the licensing of MINIX, which at the time limited it to educational use only, he began to work on his own operating system kernel, which eventually became the Linux kernel.
+
+
+
+On July 3, 1991, in an effort to implement Unix system calls, Linus Torvalds attempted to obtain a digital copy of the POSIX standards documentation with a request to the comp.os.minix newsgroup.
+
+After unsuccessfully finding the POSIX documentation, Torvalds initially resorted to determining system calls from SunOS documentation owned by the university for use in operating its Sun Microsystems server.
+
+He also learned some system calls from Tenenbaum's MINIX text.
+
+
+
+Torvalds began the development of the Linux kernel on MINIX and applications written for MINIX were also used on Linux.
+
+Later, Linux matured and further Linux kernel development took place on Linux systems.
+
+GNU applications also replaced all MINIX components, because it was advantageous to use the freely available code from the GNU Project with the fledgling operating system; code licensed under the GNU GPL can be reused in other computer programs as long as they also are released under the same or a compatible license.
+
+Torvalds initiated a switch from his original license, which prohibited commercial redistribution, to the GNU GPL.Developers worked to integrate GNU components with the Linux kernel, creating a fully functional and free operating system.
+
+
+
+Naming
+
+5.25-inch floppy disks holding a very early version of Linux
+Linus Torvalds had wanted to call his invention "Freax", a portmanteau of "free", "freak", and "x" (as an allusion to Unix).
+
+During the start of his work on the system, some of the project's makefiles included the name "Freax" for about half a year.
+
+Initially, Torvalds considered the name "Linux" but dismissed it as too egotistical.
+
+
+
+To facilitate development, the files were uploaded to the FTP server (ftp.funet.fi) of FUNET in September 1991.
+
+Ari Lemmke, Torvalds' coworker at the Helsinki University of Technology (HUT) who was one of the volunteer administrators for the FTP server at the time, did not think that "Freax" was a good name, so he named the project "Linux" on the server without consulting Torvalds.
+
+Later, however, Torvalds consented to "Linux".
+
+
+
+According to a newsgroup post by Torvalds, the word "Linux" should be pronounced (/ˈlɪnʊks/ (listen) LIN-uuks) with a short 'i' as in 'print' and 'u' as in 'put'.
+
+To further demonstrate how the word "Linux" should be pronounced, he included an audio guide with the kernel source code.
+
+However, in this recording, he pronounces Linux as /ˈlinʊks/ (LEEN-uuks) with a short but close front unrounded vowel, instead of a near-close near-front unrounded vowel as in his newsgroup post.
+
+
+
+Commercial and popular uptake
+Main article: Linux adoption
+
+Ubuntu, a popular Linux distribution
+
+Nexus 5X running Android
+Adoption of Linux in production environments, rather than being used only by hobbyists, started to take off first in the mid-1990s in the supercomputing community, where organizations such as NASA started to replace their increasingly expensive machines with clusters of inexpensive commodity computers running Linux.
+
+Commercial use began when Dell and IBM, followed by Hewlett-Packard, started offering Linux support to escape Microsoft's monopoly in the desktop operating system market.
+
+
+
+Today, Linux systems are used throughout computing, from embedded systems to virtually all supercomputers, and have secured a place in server installations such as the popular LAMP application stack.
+
+Use of Linux distributions in home and enterprise desktops has been growing.
+
+Linux distributions have also become popular in the netbook market, with many devices shipping with customized Linux distributions installed, and Google releasing their own ChromeOS designed for netbooks.
+
+
+
+Linux's greatest success in the consumer market is perhaps the mobile device market, with Android being the dominant operating system on smartphones and very popular on tablets and, more recently, on wearables.
+
+Linux gaming is also on the rise with Valve showing its support for Linux and rolling out SteamOS, its own gaming-oriented Linux distribution, which was later implemented in their Steam Deck platform.
+
+Linux distributions have also gained popularity with various local and national governments, such as the federal government of Brazil.
+
+
+
+Current development
+
+In-flight entertainment system booting up displaying the Linux logo
+Greg Kroah-Hartman is the lead maintainer for the Linux kernel and guides its development.
+
+William John Sullivan is the executive director of the Free Software Foundation, which in turn supports the GNU components.
+
+Finally, individuals and corporations develop third-party non-GNU components.
+
+These third-party components comprise a vast body of work and may include both kernel modules and user applications and libraries.
+
+
+
+Linux vendors and communities combine and distribute the kernel, GNU components, and non-GNU components, with additional package management software in the form of Linux distributions.
 

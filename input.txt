@@ -1,3 +1,6 @@
+Precursors
+
+Linus Torvalds, principal author of the Linux kernel
 The Unix operating system was conceived and implemented in 1969, at AT&T's Bell Labs, in the United States by Ken Thompson, Dennis Ritchie, Douglas McIlroy, and Joe Ossanna.[41] First released in 1971, Unix was written entirely in assembly language, as was common practice at the time. In 1973, in a key pioneering approach, it was rewritten in the C programming language by Dennis Ritchie (with the exception of some hardware and I/O routines). The availability of a high-level language implementation of Unix made its porting to different computer platforms easier.[42]
 
 Due to an earlier antitrust case forbidding it from entering the computer business, AT&T licensed the operating system's source code as a trade secret to anyone who asked. As a result, Unix grew quickly and became widely adopted by academic institutions and businesses. In 1984, AT&T divested itself of its regional operating companies, and was released from its obligation not to enter the computer business; freed of that obligation, Bell Labs began selling Unix as a proprietary product, where users were not legally allowed to modify it.[43][44]
@@ -11,3 +14,38 @@ MINIX was created by Andrew S. Tanenbaum, a computer science professor, and rele
 Although not released until 1992, due to legal complications, development of 386BSD, from which NetBSD, OpenBSD and FreeBSD descended, predated that of Linux.
 
 Linus Torvalds has stated on separate occasions that if the GNU kernel or 386BSD had been available at the time (1991), he probably would not have created Linux.[50][51]
+
+Creation
+While attending the University of Helsinki in the fall of 1990, Torvalds enrolled in a Unix course.[52] The course utilized a MicroVAX minicomputer running Ultrix, and one of the required texts was Operating Systems: Design and Implementation by Andrew S. Tanenbaum. This textbook included a copy of Tanenbaum's MINIX operating system. It was with this course that Torvalds first became exposed to Unix. In 1991, he became curious about operating systems.[53] Frustrated by the licensing of MINIX, which at the time limited it to educational use only,[49] he began to work on his own operating system kernel, which eventually became the Linux kernel.
+
+On July 3, 1991, in an effort to implement Unix system calls, Linus Torvalds attempted to obtain a digital copy of the POSIX standards documentation with a request to the comp.os.minix newsgroup.[54] After unsuccessfully finding the POSIX documentation, Torvalds initially resorted to determining system calls from SunOS documentation owned by the university for use in operating its Sun Microsystems server. He also learned some system calls from Tenenbaum's MINIX text.
+
+Torvalds began the development of the Linux kernel on MINIX and applications written for MINIX were also used on Linux. Later, Linux matured and further Linux kernel development took place on Linux systems.[55] GNU applications also replaced all MINIX components, because it was advantageous to use the freely available code from the GNU Project with the fledgling operating system; code licensed under the GNU GPL can be reused in other computer programs as long as they also are released under the same or a compatible license. Torvalds initiated a switch from his original license, which prohibited commercial redistribution, to the GNU GPL.[56] Developers worked to integrate GNU components with the Linux kernel, creating a fully functional and free operating system.[57]
+
+Naming
+
+5.25-inch floppy disks holding a very early version of Linux
+Linus Torvalds had wanted to call his invention "Freax", a portmanteau of "free", "freak", and "x" (as an allusion to Unix). During the start of his work on the system, some of the project's makefiles included the name "Freax" for about half a year. Initially, Torvalds considered the name "Linux" but dismissed it as too egotistical.[58]
+
+To facilitate development, the files were uploaded to the FTP server (ftp.funet.fi) of FUNET in September 1991. Ari Lemmke, Torvalds' coworker at the Helsinki University of Technology (HUT) who was one of the volunteer administrators for the FTP server at the time, did not think that "Freax" was a good name, so he named the project "Linux" on the server without consulting Torvalds.[58] Later, however, Torvalds consented to "Linux".
+
+According to a newsgroup post by Torvalds,[11] the word "Linux" should be pronounced (/ˈlɪnʊks/ (listen) LIN-uuks) with a short 'i' as in 'print' and 'u' as in 'put'. To further demonstrate how the word "Linux" should be pronounced, he included an audio guide with the kernel source code.[59] However, in this recording, he pronounces Linux as /ˈlinʊks/ (LEEN-uuks) with a short but close front unrounded vowel, instead of a near-close near-front unrounded vowel as in his newsgroup post.
+
+Commercial and popular uptake
+Main article: Linux adoption
+
+Ubuntu, a popular Linux distribution
+
+Nexus 5X running Android
+Adoption of Linux in production environments, rather than being used only by hobbyists, started to take off first in the mid-1990s in the supercomputing community, where organizations such as NASA started to replace their increasingly expensive machines with clusters of inexpensive commodity computers running Linux. Commercial use began when Dell and IBM, followed by Hewlett-Packard, started offering Linux support to escape Microsoft's monopoly in the desktop operating system market.[60]
+
+Today, Linux systems are used throughout computing, from embedded systems to virtually all supercomputers,[31][61] and have secured a place in server installations such as the popular LAMP application stack. Use of Linux distributions in home and enterprise desktops has been growing.[62][63][64][65][66][67][68] Linux distributions have also become popular in the netbook market, with many devices shipping with customized Linux distributions installed, and Google releasing their own ChromeOS designed for netbooks.
+
+Linux's greatest success in the consumer market is perhaps the mobile device market, with Android being the dominant operating system on smartphones and very popular on tablets and, more recently, on wearables. Linux gaming is also on the rise with Valve showing its support for Linux and rolling out SteamOS, its own gaming-oriented Linux distribution, which was later implemented in their Steam Deck platform. Linux distributions have also gained popularity with various local and national governments, such as the federal government of Brazil.[69]
+
+Current development
+
+In-flight entertainment system booting up displaying the Linux logo
+Greg Kroah-Hartman is the lead maintainer for the Linux kernel and guides its development.[70] William John Sullivan is the executive director of the Free Software Foundation,[71] which in turn supports the GNU components.[72] Finally, individuals and corporations develop third-party non-GNU components. These third-party components comprise a vast body of work and may include both kernel modules and user applications and libraries.
+
+Linux vendors and communities combine and distribute the kernel, GNU components, and non-GNU components, with additional package management software in the form of Linux distributions.
