@@ -29,7 +29,6 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
     let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
 
     for line in lines {
-
         let mut modified_line = String::new();
         let line_without_brackets = re_words.replace_all(line, "");
 
@@ -55,18 +54,45 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
 pub fn process_data(
     data: &str,
     text_to_be_replaced: &str,
-    words_to_delete: &[&str]
+    words_to_delete: &[&str],
 ) -> Result<String, Box<dyn std::error::Error>> {
     let data = delete_specific_words(&data, &words_to_delete);
     let data = delete_entire_line(&data, &text_to_be_replaced);
-    
+
     // Bad code
     // Remove double/triple trail white space to avoid making new paragraph with with extra space
     // let data = data.replace("   ", " ");
-    // let data = data.replace("  ", " ");
+    let data = data.replace(". ", ".");
 
     // Bad code
     let data = data.replace(". ", ".\n");
+
+    // let words: Vec<&str> = data.split_whitespace().collect();
+
+    // // Process each word individually
+    // let result: Vec<String> = words
+    //     .iter()
+    //     .map(|word| {
+    //         if word.ends_with('.') {
+    //             let word_without_dot = word[..word.len() - 1].to_owned();
+    //             if let Some(next_word) = words.iter().find(|&w| *w > word) {
+    //                 if next_word.starts_with(|c: char| c.is_ascii_uppercase()) && next_word.chars().nth(1) == Some(' ') && next_word.chars().nth(2).map(|c| c.is_ascii_uppercase()).unwrap_or(false) {
+    //                     // If the conditions for not formatting are met, return the word as is
+    //                     return word.to_owned();
+    //                 }
+    //             }
+    //             format!("{}. ", word_without_dot)
+    //         } else {
+    //             word.to_owned()
+    //         }
+    //     })
+    //     .collect();
+
+    // // Join the processed words back into a single string
+    // let processed_text = result.join(" ");
+
+    // let pattern = Regex::new(r"(?<=\.)\s").unwrap();
+    // let data = pattern.replace_all(&data, ".\n");
 
     let mut inside_braces = false;
     let mut new_text = String::new();
@@ -74,7 +100,7 @@ pub fn process_data(
 
     let mut data_chars = data.chars().peekable();
     while let Some(c) = data_chars.next() {
-        // For sentence/word that is inside open and close curly braces, 
+        // For sentence/word that is inside open and close curly braces,
         // do not format it.
         // Probably it is snippet
         if c == '{' {
@@ -87,7 +113,8 @@ pub fn process_data(
             match c {
                 '.' => {
                     new_text.push('.');
-                    let next_next_char = data_chars.clone().nth(1);
+                    
+                    // let next_next_char = data_chars.clone().nth(1);
 
                     // Check _._  => if both is not the one of the conditions below, the push
 
@@ -100,43 +127,37 @@ pub fn process_data(
                         // Future feature should be add:
                         // - for current dot sign, if the char before and after it is Uppercase. E.g "S.R/M.R"
                         // - A list of word that should not be format by the code since it has meaning in it.
-                        if !next_char.is_lowercase()
-                            && !next_char.is_digit(10)
-                            && next_char != '.'
-                            && !is_symbol(next_char)
-                            && (
-                                !prev_char.is_uppercase() 
-                                && !next_char.is_uppercase()
-                            )
-                            && (
-                                !prev_char.is_uppercase() 
-                                && next_char != ' '
-                                && !next_next_char.expect("Value is none").is_uppercase()
-
-                            )
-                        {
-                            new_text.push('\n');
+                        match (
+                            !next_char.is_lowercase(),
+                            !next_char.is_digit(10),
+                            next_char != '.',
+                            !is_symbol(next_char),
+                            !(prev_char.is_uppercase() && next_char.is_uppercase()),
+                        ) {
+                            (true, true, true, true, true) => {
+                                new_text.push('\n');
+                                new_text.push('\n');
+                            }
+                            _ => {}
                         }
                     }
 
                     // Base case : T. Sambathan
-                    
 
-                    
-                    // _.__ => 
-                    // check if char befor dot is uppercase and 
+                    // _.__ =>
+                    // check if char befor dot is uppercase and
                     // next next item (two positions ahead) is upper case
 
                     // match (
-                    //     prev_char_is_uppercase(Some(prev_char)), 
-                    //     next_next_char_is_uppercase(next_next_char)) 
+                    //     prev_char_is_uppercase(Some(prev_char)),
+                    //     next_next_char_is_uppercase(next_next_char))
                     // {
                     //     (Some(true), Some(true)) => {
                     //         // Action for the true case
                     //         new_text.push(' ');
                     //     }
                     //     // Add additional match arms here if needed
-                    
+
                     //     // Default case
                     //     _ => {
                     //         // Action for other cases
@@ -144,8 +165,6 @@ pub fn process_data(
                     //         new_text.push('?');
                     //     }
                     // }
-                    
-                    
 
                     prev_char = c;
                 }
@@ -153,7 +172,6 @@ pub fn process_data(
                     new_text.push(c);
                     prev_char = c;
                 }
-
             }
         } else {
             new_text.push(c);
@@ -163,21 +181,21 @@ pub fn process_data(
     Ok(new_text)
 }
 
-// There is a time that the code wont make a blank space between 2 sentences. 
+// There is a time that the code wont make a blank space between 2 sentences.
 // It because the next sentence is underly the current sentence, not attach to current sentence.
 // In order to fix this, code need to detect:
 // - If current line contains dot sign at the end of it
 // - The sentence underly the current sentence, has dot sign at the end of it
 // - If both requirements is meet then separate both sentence with a blank space
 //
-// One main problem is that, the code need to distint between 
-// - sentence that end with dot sign is "sentence" 
+// One main problem is that, the code need to distint between
+// - sentence that end with dot sign is "sentence"
 // - sentence that end with dot sign is not a "sentence" e.g snippet contains dot sign
 // #[allow(dead_code)]
 pub fn insert_blank_spaces(text: &str) -> String {
     let mut result = String::new();
 
-    // trim cloned vector 
+    // trim cloned vector
     let lines_clone: Vec<&str> = text.clone().lines().collect();
 
     // Original vector
@@ -186,11 +204,11 @@ pub fn insert_blank_spaces(text: &str) -> String {
     for i in 0..(lines_original.len() - 1) {
         // trim cloned vector
         let current_line_clone = lines_clone[i].trim();
-        let next_line_cloned = lines_clone[ i + 1 ].trim();
+        let next_line_cloned = lines_clone[i + 1].trim();
 
-        // if starts_with_uppercase(current_line) 
+        // if starts_with_uppercase(current_line)
         // && ends_with_dot_sign(current_line) {
-        //     if starts_with_uppercase(next_line) 
+        //     if starts_with_uppercase(next_line)
         //     && ends_with_dot_sign(next_line) {
         //         // In Rust, you cannot directly concatenate a char and a &str using the + operator.
         //         // To fix this, you can convert the char into a String and then use string concatenation.
@@ -203,27 +221,26 @@ pub fn insert_blank_spaces(text: &str) -> String {
         //     result.push_str(&format!("{}\n", lines[i]));
         // }
         match (
-            starts_with_uppercase(current_line_clone), 
-            ends_with_dot_sign(current_line_clone)) 
-            {
+            starts_with_uppercase(current_line_clone),
+            ends_with_dot_sign(current_line_clone),
+        ) {
             (true, true) => {
                 match (
-                    starts_with_uppercase(next_line_cloned), 
-                    ends_with_dot_sign(next_line_cloned)) 
-                    {
+                    starts_with_uppercase(next_line_cloned),
+                    ends_with_dot_sign(next_line_cloned),
+                ) {
                     (true, true) => {
                         result.push_str(&format!("{}\n\n", lines_original[i]));
-                    },
+                    }
                     _ => {
                         result.push_str(&format!("{}\n", lines_original[i]));
-                    },
+                    }
                 }
-            },
+            }
             _ => {
                 result.push_str(&format!("{}\n", lines_original[i]));
-            },
+            }
         }
-        
     }
 
     result
@@ -245,22 +262,19 @@ fn ends_with_dot_sign(string: &str) -> bool {
 //     string.ends_with('.')
 // }
 
-fn prev_char_is_uppercase(char: Option<char>) -> Option<bool> {
-    char.map(|c| c.is_uppercase())
-}
+// fn prev_char_is_uppercase(char: Option<char>) -> Option<bool> {
+//     char.map(|c| c.is_uppercase())
+// }
 
 // fn next_next_char_is_uppercase(char: Option<char>) -> Option<bool> {
 //     char.map(|c| c.is_uppercase())
 // }
 
-
-
-
 // Before format the sentence or text, check if there is blank space in the text
 // as it is indicator for new paragraph.
 // If it is, replace the parapraph with 3 paragraph between it is "---"
 // Example: "\n" replace with "\n---\n"
-// The purpose is that to separate first the original paragraph 
+// The purpose is that to separate first the original paragraph
 // and to know when is the end of current paragraph for the current separated text
 
 // fn seprator_two_paragraph(text: &str) -> String {
