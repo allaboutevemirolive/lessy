@@ -21,6 +21,18 @@ pub fn write_output_file(
 }
 
 pub fn format_output_file_name(output_file: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let output_file = output_file.replace(" ", "_").to_lowercase();
+    let output_file = String::from(output_file);
+
     Ok(Path::new(&output_file).to_path_buf())
+}
+
+pub fn format_file_name(file_name: &str) -> String {
+    let symbols = "/\\:*?\"<>|!@#$%^&()-+=[]{};,.'~` ";
+    let mut formatted_name = String::from(file_name);
+
+    for symbol in symbols.chars() {
+        formatted_name = formatted_name.replace(symbol, "_");
+    }
+
+    formatted_name.replace(" ", "_").to_lowercase()
 }

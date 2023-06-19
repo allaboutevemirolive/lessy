@@ -148,11 +148,13 @@ pub fn insert_blank_spaces(text: &str) -> String {
         let next_line_cloned = lines_clone[i + 1].trim();
 
         match (
+            // Check current line
             starts_with_uppercase(current_line_clone),
             ends_with_dot_sign(current_line_clone),
         ) {
             (true, true) => {
                 match (
+                    // Check next line
                     starts_with_uppercase(next_line_cloned),
                     ends_with_dot_sign(next_line_cloned),
                 ) {
