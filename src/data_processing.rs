@@ -60,9 +60,12 @@ pub fn process_data(
     let data = delete_specific_words(&data, &words_to_delete);
     let data = delete_entire_line(&data, &text_to_be_replaced);
     
+    // Bad code
     // Remove double/triple trail white space to avoid making new paragraph with with extra space
-    let data = data.replace("   ", " ");
-    let data = data.replace("  ", " ");
+    // let data = data.replace("   ", " ");
+    // let data = data.replace("  ", " ");
+
+    // Bad code
     let data = data.replace(". ", ".\n");
 
     let mut inside_braces = false;
@@ -84,6 +87,10 @@ pub fn process_data(
             match c {
                 '.' => {
                     new_text.push('.');
+                    let next_next_char = data_chars.clone().nth(1);
+
+                    // Check _._  => if both is not the one of the conditions below, the push
+
                     if let Some(&next_char) = data_chars.peek() {
                         // After dot sign, next char is:
                         // - digit
@@ -98,13 +105,48 @@ pub fn process_data(
                             && next_char != '.'
                             && !is_symbol(next_char)
                             && (
-                                !prev_char.is_uppercase() && 
-                                !next_char.is_uppercase()
+                                !prev_char.is_uppercase() 
+                                && !next_char.is_uppercase()
+                            )
+                            && (
+                                !prev_char.is_uppercase() 
+                                && next_char != ' '
+                                && !next_next_char.expect("Value is none").is_uppercase()
+
                             )
                         {
                             new_text.push('\n');
                         }
                     }
+
+                    // Base case : T. Sambathan
+                    
+
+                    
+                    // _.__ => 
+                    // check if char befor dot is uppercase and 
+                    // next next item (two positions ahead) is upper case
+
+                    // match (
+                    //     prev_char_is_uppercase(Some(prev_char)), 
+                    //     next_next_char_is_uppercase(next_next_char)) 
+                    // {
+                    //     (Some(true), Some(true)) => {
+                    //         // Action for the true case
+                    //         new_text.push(' ');
+                    //     }
+                    //     // Add additional match arms here if needed
+                    
+                    //     // Default case
+                    //     _ => {
+                    //         // Action for other cases
+                    //         // Placeholder action, modify it as needed
+                    //         new_text.push('?');
+                    //     }
+                    // }
+                    
+                    
+
                     prev_char = c;
                 }
                 _ => {
@@ -198,6 +240,20 @@ fn starts_with_uppercase(string: &str) -> bool {
 fn ends_with_dot_sign(string: &str) -> bool {
     string.ends_with('.')
 }
+
+// fn next_next_char_is_uppercase(char: &char) -> bool {
+//     string.ends_with('.')
+// }
+
+fn prev_char_is_uppercase(char: Option<char>) -> Option<bool> {
+    char.map(|c| c.is_uppercase())
+}
+
+// fn next_next_char_is_uppercase(char: Option<char>) -> Option<bool> {
+//     char.map(|c| c.is_uppercase())
+// }
+
+
 
 
 // Before format the sentence or text, check if there is blank space in the text
