@@ -13,11 +13,10 @@ pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     }
 
     let mut new_data = String::new();
-    let lines: Vec<&str> = data.split('\n').collect();
 
-    for line in lines {
+    for line in data.lines() {
         if line.find(text_to_be_deleted).is_none() {
-            new_data.push_str(line);
+            new_data += line;
             new_data.push('\n');
         }
     }
@@ -25,55 +24,24 @@ pub fn delete_entire_line(data: &str, text_to_be_deleted: &str) -> String {
     new_data
 }
 
-// TODO: Can be improve
-
 // Delete specific word with regex
 pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String {
     if data.is_empty() || words_to_be_deleted.is_empty() {
         return data.to_string();
     }
-    let mut new_data = String::new();
-    let lines: Vec<&str> = data.split('\n').collect();
 
     let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
+    let mut new_data = String::new();
 
-    for line in lines {
-        let mut modified_line = String::new();
+    for line in data.lines() {
         let line_without_brackets = re_words.replace_all(line, "");
-
-        for word in line_without_brackets.split(' ') {
-            modified_line.push_str(word);
-            modified_line.push(' ');
-        }
-
-        modified_line.pop();
-
-        new_data.push_str(&modified_line);
+        new_data += &line_without_brackets;
         new_data.push('\n');
-
-        // BAD DESIGN
-
-        // let pattern = words_to_be_deleted
-        //     .iter()
-        //     .map(|word| format!(r"\b{}\b", regex::escape(word)))
-        //     .collect::<Vec<String>>()
-        //     .join("|");
-
-        // let re_words = Regex::new(&pattern).unwrap();
-
-        // for line in lines {
-        //     // Cleaning line from pattern
-        //     let line_without_brackets = re_words.replace_all(line, "");
-
-        //     // Cow => &str
-        //     new_data.push_str(&line_without_brackets.to_string());
-        //     // new_data.push_str("\n");
     }
-
-    new_data = new_data.to_string();
 
     new_data
 }
+
 
 // Main string processor
 pub fn process_data(
@@ -126,8 +94,8 @@ pub fn process_data(
                     new_text.push(c);
                     prev_char = c;
                 }
-            },
-            _ => new_text.push(c),
+            }
+            _ => new_text.push(c)
         }
     }
 
@@ -145,17 +113,19 @@ pub fn process_data(
 // - sentence that end with dot sign is "sentence"
 // - sentence that end with dot sign is not a "sentence" e.g snippet contains dot sign
 pub fn insert_blank_spaces(text: &str) -> String {
+    let lines_original: Vec<&str> = text.lines().collect();
     let mut result = String::new();
 
-    // Original vector
-    let lines_original: Vec<&str> = text.lines().collect();
-
-    for i in 0..(lines_original.len() - 1) {
-        result.push_str(&format!("{}\n", lines_original[i]));
+    for (i, line) in lines_original.iter().enumerate() {
+        result.push_str(line);
+        if i < lines_original.len() - 1 {
+            result.push('\n');
+        }
     }
 
     result
 }
+
 
 // After dot sign, next char is:
 // - digit

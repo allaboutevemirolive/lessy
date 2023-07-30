@@ -1,338 +1,679 @@
-Controlling How Tests Are Run
-Just as cargo run compiles your code and then runs the resulting binary, cargo test compiles your code in test mode and runs the resulting test binary.
+Linux (/ˈlɪnʊks/ LIN-uuks) is a family of open-source Unix-like operating systems based on the Linux kernel, an operating system kernel first released on September 17, 1991, by Linus Torvalds.
 
-The default behavior of the binary produced by cargo test is to run all the tests in parallel and capture output generated during test runs, preventing the output from being displayed and making it easier to read the output related to the test results.
+Linux is typically packaged as a Linux distribution, which includes the kernel and supporting system software and libraries, many of which are provided by the GNU Project.
 
-You can, however, specify command line options to change this default behavior.
+Many Linux distributions use the word "Linux" in their name, but the Free Software Foundation uses the name "GNU/Linux" to emphasize the use and importance of GNU software in many distributions, causing some controversy.
 
 
 
-Some command line options go to cargo test, and some go to the resulting test binary.
+Popular Linux distributions include Debian, Fedora Linux, and Ubuntu.
 
-To separate these two types of arguments, you list the arguments that go to cargo test followed by the separator -- and then the ones that go to the test binary.
+Commercial distributions include Red Hat Enterprise Linux and SUSE Linux Enterprise.
 
-Running cargo test --help displays the options you can use with cargo test, and running cargo test -- --help displays the options you can use after the separator.
+Desktop Linux distributions include a windowing system such as X11 or Wayland, and a desktop environment such as GNOME or KDE Plasma.
 
+Distributions intended for servers may omit graphics altogether, or include a solution stack such as LAMP.Because Linux is freely redistributable, anyone may create a distribution for any purpose.
 
 
-Running Tests in Parallel or Consecutively
-When you run multiple tests, by default they run in parallel using threads, meaning they finish running faster and you get feedback quicker.
 
-Because the tests are running at the same time, you must make sure your tests don’t depend on each other or on any shared state, including a shared environment, such as the current working directory or environment variables.
+Linux was originally developed for personal computers based on the Intel x86 architecture, but has since been ported to more platforms than any other operating system.
 
+Because of the dominance of the Linux-based Android on smartphones, Linux, including Android, has the largest installed base of all general-purpose operating systems, as of May 2022.
 
+Although Linux is, as of November 2022, used by only around 2.6 percent of desktop computers, the Chromebook, which runs the Linux kernel-based ChromeOS, dominates the US K–12 education market and represents nearly 20 percent of sub-$300 notebook sales in the US.Linux is the leading operating system on servers (over 96.4% of the top 1 million web servers' operating systems are Linux), leads other big iron systems such as mainframe computers, and is used on all of the world's 500 fastest supercomputers[d] (since November 2017, having gradually displaced all competitors).
 
-For example, say each of your tests runs some code that creates a file on disk named test-output.txt and writes some data to that file.
 
-Then each test reads the data in that file and asserts that the file contains a particular value, which is different in each test.
 
-Because the tests run at the same time, one test might overwrite the file in the time between another test writing and reading the file.
+Linux also runs on embedded systems, i.e.devices whose operating system is typically built into the firmware and is highly tailored to the system.
 
-The second test will then fail, not because the code is incorrect but because the tests have interfered with each other while running in parallel.
+This includes routers, automation controls, smart home devices, video game consoles, televisions (Samsung and LG Smart TVs), automobiles (Tesla, Audi, Mercedes-Benz, Hyundai and Toyota), and spacecraft (Falcon 9 rocket, Dragon crew capsule and the Perseverance rover).
 
-One solution is to make sure each test writes to a different file; another solution is to run the tests one at a time.
 
 
+Linux is one of the most prominent examples of free and open-source software collaboration.
 
-If you don’t want to run the tests in parallel or if you want more fine-grained control over the number of threads used, you can send the --test-threads flag and the number of threads you want to use to the test binary.
+The source code may be used, modified and distributed commercially or non-commercially by anyone under the terms of its respective licenses, such as the GNU General Public License (GPL).
 
-Take a look at the following example:
+The Linux kernel, for example, is licensed under the GPLv2, with an exception for system calls that allows code that calls the kernel via system calls not to be licensed under the GPL.
 
-$ cargo test -- --test-threads=1
-We set the number of test threads to 1, telling the program not to use any parallelism.
 
-Running the tests using one thread will take longer than running them in parallel, but the tests won’t interfere with each other if they share state.
+History
+Main article: History of Linux
+Precursors
 
+Linus Torvalds, principal author of the Linux kernel
+The Unix operating system was conceived and implemented in 1969, at AT&T's Bell Labs, in the United States by Ken Thompson, Dennis Ritchie, Douglas McIlroy, and Joe Ossanna.
 
+First released in 1971, Unix was written entirely in assembly language, as was common practice at the time.
 
-Showing Function Output
-By default, if a test passes, Rust’s test library captures anything printed to standard output.
+In 1973, in a key pioneering approach, it was rewritten in the C programming language by Dennis Ritchie (with the exception of some hardware and I/O routines).
 
-For example, if we call println! in a test and the test passes, we won’t see the println! output in the terminal; we’ll see only the line that indicates the test passed.
+The availability of a high-level language implementation of Unix made its porting to different computer platforms easier.
 
-If a test fails, we’ll see whatever was printed to standard output with the rest of the failure message.
 
 
+Due to an earlier antitrust case forbidding it from entering the computer business, AT&T licensed the operating system's source code as a trade secret to anyone who asked.
 
-As an example, Listing 11-10 has a silly function that prints the value of its parameter and returns 10, as well as a test that passes and a test that fails.
+As a result, Unix grew quickly and became widely adopted by academic institutions and businesses.
 
+In 1984, AT&T divested itself of its regional operating companies, and was released from its obligation not to enter the computer business; freed of that obligation, Bell Labs began selling Unix as a proprietary product, where users were not legally allowed to modify it.
 
 
-Filename: src/lib.rs
 
-This code panics!
-fn prints_and_returns_10(a: i32) -> i32 {
-    println!("I got the value {}", a);
-    10
-}
+Onyx Systems began selling early microcomputer-based Unix workstations in 1980.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+Later, Sun Microsystems, founded as a spin-off of a student project at Stanford University, also began selling Unix-based desktop workstations in 1982.
 
-    #[test]
-    fn this_test_will_pass() {
-        let value = prints_and_returns_10(4);
-        assert_eq!(10, value);
-    }
+While Sun workstations did not utilize commodity PC hardware, for which Linux was later originally developed, it represented the first successful commercial attempt at distributing a primarily single-user microcomputer that ran a Unix operating system.
 
-    #[test]
-    fn this_test_will_fail() {
-        let value = prints_and_returns_10(8);
-        assert_eq!(5, value);
-    }
-}
-Listing 11-10: Tests for a function that calls println!
 
-When we run these tests with cargo test, we’ll see the following output:
 
-$ cargo test
-   Compiling silly-function v0.1.0 (file:///projects/silly-function)
-    Finished test [unoptimized + debuginfo] target(s) in 0.58s
-     Running unittests src/lib.rs (target/debug/deps/silly_function-160869f38cff9166)
+With Unix increasingly "locked in" as a proprietary product, the GNU Project, started in 1983 by Richard Stallman, had the goal of creating a "complete Unix-compatible software system" composed entirely of free software.
 
-running 2 tests
-test tests::this_test_will_fail ...
+Work began in 1984.
 
-FAILED
-test tests::this_test_will_pass ...ok
+Later, in 1985, Stallman started the Free Software Foundation and wrote the GNU General Public License (GNU GPL) in 1989.
 
-failures:
+By the early 1990s, many of the programs required in an operating system (such as libraries, compilers, text editors, a command-line shell, and a windowing system) were completed, although low-level elements such as device drivers, daemons, and the kernel, called GNU Hurd, were stalled and incomplete.
 
----- tests::this_test_will_fail stdout ----
-I got the value 8
-thread 'tests::this_test_will_fail' panicked at 'assertion failed: `(left == right)`
-  left: `5`,
- right: `10`', src/lib.rs:19:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 
-failures:
-    tests::this_test_will_fail
+MINIX was created by Andrew S.Tanenbaum, a computer science professor, and released in 1987 as a minimal Unix-like operating system targeted at students and others who wanted to learn operating system principles.
 
-test result: FAILED.1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+Although the complete source code of MINIX was freely available, the licensing terms prevented it from being free software until the licensing changed in April 2000.
 
-error: test failed, to rerun pass `--lib`
-Note that nowhere in this output do we see I got the value 4, which is what is printed when the test that passes runs.
 
-That output has been captured.
 
-The output from the test that failed, I got the value 8, appears in the section of the test summary output, which also shows the cause of the test failure.
+Although not released until 1992, due to legal complications, development of 386BSD, from which NetBSD, OpenBSD and FreeBSD descended, predated that of Linux.
 
 
 
-If we want to see printed values for passing tests as well, we can tell Rust to also show the output of successful tests with --show-output.
+Linus Torvalds has stated on separate occasions that if the GNU kernel or 386BSD had been available at the time (1991), he probably would not have created Linux.
 
 
 
-$ cargo test -- --show-output
-When we run the tests in Listing 11-10 again with the --show-output flag, we see the following output:
+Creation
+While attending the University of Helsinki in the fall of 1990, Torvalds enrolled in a Unix course.
 
-$ cargo test -- --show-output
-   Compiling silly-function v0.1.0 (file:///projects/silly-function)
-    Finished test [unoptimized + debuginfo] target(s) in 0.60s
-     Running unittests src/lib.rs (target/debug/deps/silly_function-160869f38cff9166)
+The course utilized a MicroVAX minicomputer running Ultrix, and one of the required texts was Operating Systems: Design and Implementation by Andrew S.Tanenbaum.
 
-running 2 tests
-test tests::this_test_will_fail ...
+This textbook included a copy of Tanenbaum's MINIX operating system.
 
-FAILED
-test tests::this_test_will_pass ...ok
+It was with this course that Torvalds first became exposed to Unix.
 
-successes:
+In 1991, he became curious about operating systems.
 
----- tests::this_test_will_pass stdout ----
-I got the value 4
+Frustrated by the licensing of MINIX, which at the time limited it to educational use only, he began to work on his own operating system kernel, which eventually became the Linux kernel.
 
 
-successes:
-    tests::this_test_will_pass
 
-failures:
+On July 3, 1991, in an effort to implement Unix system calls, Linus Torvalds attempted unsuccessfully to obtain a digital copy of the POSIX standards documentation with a request to the comp.os.minix newsgroup.
 
----- tests::this_test_will_fail stdout ----
-I got the value 8
-thread 'tests::this_test_will_fail' panicked at 'assertion failed: `(left == right)`
-  left: `5`,
- right: `10`', src/lib.rs:19:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+After not finding the POSIX documentation, Torvalds initially resorted to determining system calls from SunOS documentation owned by the university for use in operating its Sun Microsystems server.
 
+He also learned some system calls from Tanenbaum's MINIX text.
 
-failures:
-    tests::this_test_will_fail
 
-test result: FAILED.1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-error: test failed, to rerun pass `--lib`
-Running a Subset of Tests by Name
-Sometimes, running a full test suite can take a long time.
+Torvalds began the development of the Linux kernel on MINIX and applications written for MINIX were also used on Linux.
 
-If you’re working on code in a particular area, you might want to run only the tests pertaining to that code.
+Later, Linux matured and further Linux kernel development took place on Linux systems.
 
-You can choose which tests to run by passing cargo test the name or names of the test(s) you want to run as an argument.
+GNU applications also replaced all MINIX components, because it was advantageous to use the freely available code from the GNU Project with the fledgling operating system; code licensed under the GNU GPL can be reused in other computer programs as long as they also are released under the same or a compatible license.
 
+Torvalds initiated a switch from his original license, which prohibited commercial redistribution, to the GNU GPL.Developers worked to integrate GNU components with the Linux kernel, creating a fully functional and free operating system.
 
 
-To demonstrate how to run a subset of tests, we’ll first create three tests for our add_two function, as shown in Listing 11-11, and choose which ones to run.
 
+Naming
 
+5.25-inch floppy disks holding a very early version of Linux
+Linus Torvalds had wanted to call his invention "Freax", a portmanteau of "free", "freak", and "x" (as an allusion to Unix).
 
-Filename: src/lib.rs
+During the start of his work on the system, some of the project's makefiles included the name "Freax" for about half a year.
 
-pub fn add_two(a: i32) -> i32 {
-    a + 2
-}
+Initially, Torvalds considered the name "Linux" but dismissed it as too egotistical.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn add_two_and_two() {
-        assert_eq!(4, add_two(2));
-    }
 
-    #[test]
-    fn add_three_and_two() {
-        assert_eq!(5, add_two(3));
-    }
+To facilitate development, the files were uploaded to the FTP server (ftp.funet.fi) of FUNET in September 1991.
 
-    #[test]
-    fn one_hundred() {
-        assert_eq!(102, add_two(100));
-    }
-}
-Listing 11-11: Three tests with three different names
+Ari Lemmke, Torvalds' coworker at the Helsinki University of Technology (HUT) who was one of the volunteer administrators for the FTP server at the time, did not think that "Freax" was a good name, so he named the project "Linux" on the server without consulting Torvalds.
 
-If we run the tests without passing any arguments, as we saw earlier, all the tests will run in parallel:
+Later, however, Torvalds consented to "Linux".
 
-$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.62s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
 
-running 3 tests
-test tests::add_three_and_two ...ok
-test tests::add_two_and_two ...ok
-test tests::one_hundred ...ok
 
-test result: ok.3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+According to a newsgroup post by Torvalds, the word "Linux" should be pronounced (/ˈlɪnʊks/ (listen) LIN-uuks) with a short 'i' as in 'print' and 'u' as in 'put'.
 
-   Doc-tests adder
+To further demonstrate how the word "Linux" should be pronounced, he included an audio guide with the kernel source code.
 
-running 0 tests
+However, in this recording, he pronounces Linux as /ˈlinʊks/ (LEEN-uuks) with a short but close front unrounded vowel, instead of a near-close near-front unrounded vowel as in his newsgroup post.
 
-test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-Running Single Tests
-We can pass the name of any test function to cargo test to run only that test:
 
-$ cargo test one_hundred
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.69s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+Commercial and popular uptake
+Main article: Linux adoption
 
-running 1 test
-test tests::one_hundred ...ok
+Ubuntu, a popular Linux distribution
 
-test result: ok.1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+Nexus 5X running Android
+Adoption of Linux in production environments, rather than being used only by hobbyists, started to take off first in the mid-1990s in the supercomputing community, where organizations such as NASA started to replace their increasingly expensive machines with clusters of inexpensive commodity computers running Linux.
 
-Only the test with the name one_hundred ran; the other two tests didn’t match that name.
+Commercial use began when Dell and IBM, followed by Hewlett-Packard, started offering Linux support to escape Microsoft's monopoly in the desktop operating system market.
 
-The test output lets us know we had more tests that didn’t run by displaying 2 filtered out at the end.
 
 
+Today, Linux systems are used throughout computing, from embedded systems to virtually all supercomputers, and have secured a place in server installations such as the popular LAMP application stack.
 
-We can’t specify the names of multiple tests in this way; only the first value given to cargo test will be used.
+Use of Linux distributions in home and enterprise desktops has been growing.
 
-But there is a way to run multiple tests.
+Linux distributions have also become popular in the netbook market, with many devices shipping with customized Linux distributions installed, and Google releasing their own ChromeOS designed for netbooks.
 
 
 
-Filtering to Run Multiple Tests
-We can specify part of a test name, and any test whose name matches that value will be run.
+Linux's greatest success in the consumer market is perhaps the mobile device market, with Android being the dominant operating system on smartphones and very popular on tablets and, more recently, on wearables.
 
-For example, because two of our tests’ names contain add, we can run those two by running cargo test add:
+Linux gaming is also on the rise with Valve showing its support for Linux and rolling out SteamOS, its own gaming-oriented Linux distribution, which was later implemented in their Steam Deck platform.
 
-$ cargo test add
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.61s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+Linux distributions have also gained popularity with various local and national governments, such as the federal government of Brazil.
 
-running 2 tests
-test tests::add_three_and_two ...ok
-test tests::add_two_and_two ...ok
 
-test result: ok.2 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
 
-This command ran all tests with add in the name and filtered out the test named one_hundred.
+Current development
 
-Also note that the module in which a test appears becomes part of the test’s name, so we can run all the tests in a module by filtering on the module’s name.
+In-flight entertainment system booting up displaying the Linux logo
+Greg Kroah-Hartman is the lead maintainer for the Linux kernel and guides its development.
 
+William John Sullivan is the executive director of the Free Software Foundation, which in turn supports the GNU components.
 
+Finally, individuals and corporations develop third-party non-GNU components.
 
-Ignoring Some Tests Unless Specifically Requested
-Sometimes a few specific tests can be very time-consuming to execute, so you might want to exclude them during most runs of cargo test.
+These third-party components comprise a vast body of work and may include both kernel modules and user applications and libraries.
 
-Rather than listing as arguments all tests you do want to run, you can instead annotate the time-consuming tests using the ignore attribute to exclude them, as shown here:
 
-Filename: src/lib.rs
 
-#[test]
-fn it_works() {
-    assert_eq!(2 + 2, 4);
-}
+Linux vendors and communities combine and distribute the kernel, GNU components, and non-GNU components, with additional package management software in the form of Linux distributions.
 
-#[test]
-#[ignore]
-fn expensive_test() {
-    // code that takes an hour to run
-}
-After #[test] we add the #[ignore] line to the test we want to exclude.
 
-Now when we run our tests, it_works runs, but expensive_test doesn’t:
 
-$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.60s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
+Design
+See also: Linux kernel § Architecture and features
+Many open source developers agree that the Linux kernel was not designed but rather evolved through natural selection.
 
-running 2 tests
-test expensive_test ...ignored
-test it_works ...ok
+Torvalds considers that although the design of Unix served as a scaffolding, "Linux grew with a lot of mutations – and because the mutations were less than random, they were faster and more directed than alpha-particles in DNA." Eric S.Raymond considers Linux's revolutionary aspects to be social, not technical: before Linux, complex software was designed carefully by small groups, but "Linux evolved in a completely different way.
 
-test result: ok.1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+From nearly the beginning, it was rather casually hacked on by huge numbers of volunteers coordinating only through the Internet.
 
-   Doc-tests adder
+Quality was maintained not by rigid standards or autocracy but by the naively simple strategy of releasing every week and getting feedback from hundreds of users within days, creating a sort of rapid Darwinian selection on the mutations introduced by developers." Bryan Cantrill, an engineer of a competing OS, agrees that "Linux wasn't designed, it evolved", but considers this to be a limitation, proposing that some features, especially those related to security, cannot be evolved into, "this is not a biological system at the end of the day, it's a software system."
 
-running 0 tests
+A Linux-based system is a modular Unix-like operating system, deriving much of its basic design from principles established in Unix during the 1970s and 1980s.
 
-test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+Such a system uses a monolithic kernel, the Linux kernel, which handles process control, networking, access to the peripherals, and file systems.
 
-The expensive_test function is listed as ignored.
+Device drivers are either integrated directly with the kernel, or added as modules that are loaded while the system is running.
 
-If we want to run only the ignored tests, we can use cargo test -- --ignored:
 
-$ cargo test -- --ignored
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.61s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
 
-running 1 test
-test expensive_test ...ok
+The GNU userland is a key part of most systems based on the Linux kernel, with Android being the notable exception.
 
-test result: ok.1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+The GNU C library, an implementation of the C standard library, works as a wrapper for the system calls of the Linux kernel necessary to the kernel-userspace interface, the toolchain is a broad collection of programming tools vital to Linux development (including the compilers used to build the Linux kernel itself), and the coreutils implement many basic Unix tools.
 
-   Doc-tests adder
+The GNU Project also develops Bash, a popular CLI shell.
 
-running 0 tests
+The graphical user interface (or GUI) used by most Linux systems is built on top of an implementation of the X Window System.
 
-test result: ok.0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+More recently, the Linux community seeks to advance to Wayland as the new display server protocol in place of X11.
 
-By controlling which tests run, you can make sure your cargo test results will be fast.
+Many other open-source software projects contribute to Linux systems.
 
-When you’re at a point where it makes sense to check the results of the ignored tests and you have time to wait for the results, you can run cargo test -- --ignored instead.
 
-If you want to run all tests whether they’re ignored or not, you can run cargo test -- --include-ignored.
 
+Various layers within Linux, also showing separation between the userland and kernel space
+User mode	User applications	bash, LibreOffice, GIMP, Blender, 0 A.D., Mozilla Firefox, ...
+
+
+System components	init daemon:
+OpenRC, runit, systemd...
+
+	System daemons:
+polkitd, smbd, sshd, udevd...
+
+	Window manager:
+X11, Wayland, SurfaceFlinger (Android)	Graphics:
+Mesa, AMD Catalyst, ...
+
+	Other libraries:
+GTK, Qt, EFL, SDL, SFML, FLTK, GNUstep, ...
+
+
+C standard library	fopen, execv, malloc, memcpy, localtime, pthread_create...(up to 2000 subroutines)
+glibc aims to be fast, musl aims to be lightweight, uClibc targets embedded systems, bionic was written for Android, etc.
+
+All aim to be POSIX/SUS-compatible.
+
+
+Kernel mode	Linux kernel	stat, splice, dup, read, open, ioctl, write, mmap, close, exit, etc.(about 380 system calls)
+The Linux kernel System Call Interface (SCI), aims to be POSIX/SUS-compatible
+Process scheduling subsystem	IPC subsystem	Memory management subsystem	Virtual files subsystem	Networking subsystem
+Other components: ALSA, DRI, evdev, klibc, LVM, device mapper, Linux Network Scheduler, Netfilter
+Linux Security Modules: SELinux, TOMOYO, AppArmor, Smack
+Hardware (CPU, main memory, data storage devices, etc.)
+Installed components of a Linux system include the following:
+
+A bootloader, for example GNU GRUB, LILO, SYSLINUX or systemd-boot.
+
+This is a program that loads the Linux kernel into the computer's main memory, by being executed by the computer when it is turned on and after the firmware initialization is performed.
+
+
+An init program, such as the traditional sysvinit and the newer systemd, OpenRC and Upstart.
+
+This is the first process launched by the Linux kernel, and is at the root of the process tree.
+
+It starts processes such as system services and login prompts (whether graphical or in terminal mode).
+
+
+Software libraries, which contain code that can be used by running processes.
+
+On Linux systems using ELF-format executable files, the dynamic linker that manages the use of dynamic libraries is known as ld-linux.so.
+
+If the system is set up for the user to compile software themselves, header files will also be included to describe the programming interface of installed libraries.
+
+Besides the most commonly used software library on Linux systems, the GNU C Library (glibc), there are numerous other libraries, such as SDL and Mesa.
+
+
+The C standard library is the library necessary to run programs written in C on a computer system, with the GNU C Library being the standard.
+
+It provides an implementation of the POSIX API, as well as extensions to that API.For embedded systems, alternatives such as musl, EGLIBC (a glibc fork once used by Debian) and uClibc (which was designed for uClinux) have been developed, although the last two are no longer maintained.
+
+Android uses its own C library, Bionic.
+
+However, musl can additionally be used as a replacement for glibc on desktop and laptop systems, as seen on certain Linux distributions like Void Linux.
+
+
+Basic Unix commands, with GNU coreutils being the standard implementation.
+
+Alternatives exist for embedded systems, such as the copyleft BusyBox, and the BSD-licensed Toybox.
+
+
+Widget toolkits are the libraries used to build graphical user interfaces (GUIs) for software applications.
+
+Numerous widget toolkits are available, including GTK and Clutter developed by the GNOME Project, Qt developed by the Qt Project and led by The Qt Company, and Enlightenment Foundation Libraries (EFL) developed primarily by the Enlightenment team.
+
+
+A package management system, such as dpkg and RPM.Alternatively packages can be compiled from binary or source tarballs.
+
+
+User interface programs such as command shells or windowing environments.
+
+
+User interface
+The user interface, also known as the shell, is either a command-line interface (CLI), a graphical user interface (GUI), or controls attached to the associated hardware, which is common for embedded systems.
+
+For desktop systems, the default user interface is usually graphical, although the CLI is commonly available through terminal emulator windows or on a separate virtual console.
+
+
+
+CLI shells are text-based user interfaces, which use text for both input and output.
+
+The dominant shell used in Linux is the Bourne-Again Shell (bash), originally developed for the GNU Project.
+
+Most low-level Linux components, including various parts of the userland, use the CLI exclusively.
+
+The CLI is particularly suited for automation of repetitive or delayed tasks and provides very simple inter-process communication.
+
+
+
+On desktop systems, the most popular user interfaces are the GUI shells, packaged together with extensive desktop environments, such as KDE Plasma, GNOME, MATE, Cinnamon, LXDE, Pantheon and Xfce, though a variety of additional user interfaces exist.
+
+Most popular user interfaces are based on the X Window System, often simply called "X".
+
+It provides network transparency and permits a graphical application running on one system to be displayed on another where a user may interact with the application; however, certain extensions of the X Window System are not capable of working over the network.
+
+Several X display servers exist, with the reference implementation, X.Org Server, being the most popular.
+
+
+
+Server distributions might provide a command-line interface for developers and administrators, but provide a custom interface towards end-users, designed for the use-case of the system.
+
+This custom interface is accessed through a client that resides on another system, not necessarily Linux based.
+
+
+
+Several types of window managers exist for X11, including tiling, dynamic, stacking and compositing.
+
+Window managers provide means to control the placement and appearance of individual application windows, and interact with the X Window System.
+
+Simpler X window managers such as dwm, ratpoison, i3wm, or herbstluftwm provide a minimalist functionality, while more elaborate window managers such as FVWM, Enlightenment or Window Maker provide more features such as a built-in taskbar and themes, but are still lightweight when compared to desktop environments.
+
+Desktop environments include window managers as part of their standard installations, such as Mutter (GNOME), KWin (KDE) or Xfwm (xfce), although users may choose to use a different window manager if preferred.
+
+
+
+Wayland is a display server protocol intended as a replacement for the X11 protocol; as of 2022, it has received relatively wide adoption.
+
+Unlike X11, Wayland does not need an external window manager and compositing manager.
+
+Therefore, a Wayland compositor takes the role of the display server, window manager and compositing manager.
+
+Weston is the reference implementation of Wayland, while GNOME's Mutter and KDE's KWin are being ported to Wayland as standalone display servers.
+
+Enlightenment has already been successfully ported since version 19.
+
+
+
+Video input infrastructure
+Main article: Video4Linux
+Linux currently has two modern kernel-userspace APIs for handling video input devices: V4L2 API for video streams and radio, and DVB API for digital TV reception.
+
+
+
+Due to the complexity and diversity of different devices, and due to the large number of formats and standards handled by those APIs, this infrastructure needs to evolve to better fit other devices.
+
+Also, a good userspace device library is the key of the success for having userspace applications to be able to work with all formats supported by those devices.
+
+
+
+Development
+
+Simplified history of Unix-like operating systems.
+
+Linux shares similar architecture and concepts (as part of the POSIX standard) but does not share non-free source code with the original Unix or MINIX.
+
+
+Main articles: Linux distribution and Free software
+The primary difference between Linux and many other popular contemporary operating systems is that the Linux kernel and other components are free and open-source software.
+
+Linux is not the only such operating system, although it is by far the most widely used.
+
+Some free and open-source software licenses are based on the principle of copyleft, a kind of reciprocity: any work derived from a copyleft piece of software must also be copyleft itself.
+
+The most common free software license, the GNU General Public License (GPL), is a form of copyleft, and is used for the Linux kernel and many of the components from the GNU Project.
+
+
+
+Linux-based distributions are intended by developers for interoperability with other operating systems and established computing standards.
+
+Linux systems adhere to POSIX, SUS, LSB, ISO, and ANSI standards where possible, although to date only one Linux distribution has been POSIX.1 certified, Linux-FT.
+
+
+
+Free software projects, although developed through collaboration, are often produced independently of each other.
+
+The fact that the software licenses explicitly permit redistribution, however, provides a basis for larger-scale projects that collect the software produced by stand-alone projects and make it available all at once in the form of a Linux distribution.
+
+
+
+Many Linux distributions manage a remote collection of system software and application software packages available for download and installation through a network connection.
+
+This allows users to adapt the operating system to their specific needs.
+
+Distributions are maintained by individuals, loose-knit teams, volunteer organizations, and commercial entities.
+
+A distribution is responsible for the default configuration of the installed Linux kernel, general system security, and more generally integration of the different software packages into a coherent whole.
+
+Distributions typically use a package manager such as apt, yum, zypper, pacman or portage to install, remove, and update all of a system's software from one central location.
+
+
+
+Community
+See also: Free software community and Linux User Group
+A distribution is largely driven by its developer and user communities.
+
+Some vendors develop and fund their distributions on a volunteer basis, Debian being a well-known example.
+
+Others maintain a community version of their commercial distributions, as Red Hat does with Fedora, and SUSE does with openSUSE.
+
+
+
+In many cities and regions, local associations known as Linux User Groups (LUGs) seek to promote their preferred distribution and by extension free software.
+
+They hold meetings and provide free demonstrations, training, technical support, and operating system installation to new users.
+
+Many Internet communities also provide support to Linux users and developers.
+
+Most distributions and free software / open-source projects have IRC chatrooms or newsgroups.
+
+Online forums are another means for support, with notable examples being LinuxQuestions.org and the various distribution specific support and community forums, such as ones for Ubuntu, Fedora, and Gentoo.
+
+Linux distributions host mailing lists; commonly there will be a specific topic such as usage or development for a given list.
+
+
+
+There are several technology websites with a Linux focus.
+
+Print magazines on Linux often bundle cover disks that carry software or even complete Linux distributions.
+
+
+
+Although Linux distributions are generally available without charge, several large corporations sell, support, and contribute to the development of the components of the system and of free software.
+
+An analysis of the Linux kernel in 2017 showed that well over 85% of the code developed by programmers who are being paid for their work, leaving about 8.2% to unpaid developers and 4.1% unclassified.
+
+Some of the major corporations that provide contributions include Intel, Samsung, Google, AMD, Oracle and Facebook.
+
+A number of corporations, notably Red Hat, Canonical and SUSE, have built a significant business around Linux distributions.
+
+
+
+The free software licenses, on which the various software packages of a distribution built on the Linux kernel are based, explicitly accommodate and encourage commercialization; the relationship between a Linux distribution as a whole and individual vendors may be seen as symbiotic.
+
+One common business model of commercial suppliers is charging for support, especially for business users.
+
+A number of companies also offer a specialized business version of their distribution, which adds proprietary support packages and tools to administer higher numbers of installations or to simplify administrative tasks.
+
+
+
+Another business model is to give away the software to sell hardware.
+
+This used to be the norm in the computer industry, with operating systems such as CP/M, Apple DOS and versions of the classic Mac OS prior to 7.6 freely copyable (but not modifiable).
+
+As computer hardware standardized throughout the 1980s, it became more difficult for hardware manufacturers to profit from this tactic, as the OS would run on any manufacturer's computer that shared the same architecture.
+
+
+
+Programming on Linux
+Most programming languages support Linux either directly or through third-party community based ports.
+
+The original development tools used for building both Linux applications and operating system programs are found within the GNU toolchain, which includes the GNU Compiler Collection (GCC) and the GNU Build System.
+
+Amongst others, GCC provides compilers for Ada, C, C++, Go and Fortran.
+
+Many programming languages have a cross-platform reference implementation that supports Linux, for example PHP, Perl, Ruby, Python, Java, Go, Rust and Haskell.
+
+First released in 2003, the LLVM project provides an alternative cross-platform open-source compiler for many languages.
+
+Proprietary compilers for Linux include the Intel C++ Compiler, Sun Studio, and IBM XL C/C++ Compiler.
+
+BASIC in the form of Visual Basic is supported in such forms as Gambas, FreeBASIC, and XBasic, and in terms of terminal programming or QuickBASIC or Turbo BASIC programming in the form of QB64.
+
+
+
+A common feature of Unix-like systems, Linux includes traditional specific-purpose programming languages targeted at scripting, text processing and system configuration and management in general.
+
+Linux distributions support shell scripts, awk, sed and make.
+
+Many programs also have an embedded programming language to support configuring or programming themselves.
+
+For example, regular expressions are supported in programs like grep and locate, the traditional Unix MTA Sendmail contains its own Turing complete scripting system, and the advanced text editor GNU Emacs is built around a general purpose Lisp interpreter.
+
+
+
+Most distributions also include support for PHP, Perl, Ruby, Python and other dynamic languages.
+
+While not as common, Linux also supports C# (via Mono), Vala, and Scheme.
+
+Guile Scheme acts as an extension language targeting the GNU system utilities, seeking to make the conventionally small, static, compiled C programs of Unix design rapidly and dynamically extensible via an elegant, functional high-level scripting system; many GNU programs can be compiled with optional Guile bindings to this end.
+
+A number of Java virtual machines and development kits run on Linux, including the original Sun Microsystems JVM (HotSpot), and IBM's J2SE RE, as well as many open-source projects like Kaffe and Jikes RVM.
+
+
+
+GNOME and KDE are popular desktop environments and provide a framework for developing applications.
+
+These projects are based on the GTK and Qt widget toolkits, respectively, which can also be used independently of the larger framework.
+
+Both support a wide variety of languages.
+
+There are a number of Integrated development environments available including Anjuta, Code::Blocks, CodeLite, Eclipse, Geany, ActiveState Komodo, KDevelop, Lazarus, MonoDevelop, NetBeans, and Qt Creator, while the long-established editors Vim, nano and Emacs remain popular.
+
+
+
+Hardware support
+
+Linux is ubiquitously found on various types of hardware.
+
+
+See also: List of Linux-supported computer architectures
+The Linux kernel is a widely ported operating system kernel, available for devices ranging from mobile phones to supercomputers; it runs on a highly diverse range of computer architectures, including ARM-based Android smartphones and the IBM Z mainframes.
+
+Specialized distributions and kernel forks exist for less mainstream architectures; for example, the ELKS kernel fork can run on Intel 8086 or Intel 80286 16-bit microprocessors, while the µClinux kernel fork may run on systems without a memory management unit.
+
+The kernel also runs on architectures that were only ever intended to use a manufacturer-created operating system, such as Macintosh computers (with PowerPC, Intel, and Apple silicon processors), PDAs, video game consoles, portable music players, and mobile phones.
+
+
+
+Linux has a reputation of supporting old hardware very well by maintaining standardized drivers for a long time.
+
+There are several industry associations and hardware conferences devoted to maintaining and improving support for diverse hardware under Linux, such as FreedomHEC.Over time, support for different hardware has improved in Linux, resulting in any off-the-shelf purchase having a "good chance" of being compatible.
+
+
+
+In 2014, a new initiative was launched to automatically collect a database of all tested hardware configurations.
+
+
+
+Uses
+Main article: Linux range of use
+Market share and uptake
+Main article: Linux adoption
+See also: Usage share of operating systems
+Many quantitative studies of free/open-source software focus on topics including market share and reliability, with numerous studies specifically examining Linux.
+
+The Linux market is growing, and the Linux operating system market size is expected to see a growth of 19.2% by 2027, reaching $15.64 billion, compared to $3.89 billion in 2019.
+
+Analysts and proponents attribute the relative success of Linux to its security, reliability, low cost, and freedom from vendor lock-in.
+
+
+
+Desktops and laptops
+According to web server statistics (that is, based on the numbers recorded from visits to websites by client devices), as of May 2022, the estimated market share of Linux on desktop computers is around 2.5%.
+
+In comparison, Microsoft Windows has a market share of around 75.5%, while macOS covers around 14.9%.
+
+
+Web servers
+W3Cook publishes stats that use the top 1,000,000 Alexa domains, which as of May 2015 estimate that 96.55% of web servers run Linux, 1.73% run Windows, and 1.72% run FreeBSD.
+
+
+W3Techs publishes stats that use the top 10,000,000 Alexa domains and the top 1,000,000 Tranco domains, updated monthly and as of November 2020 estimate that Linux is used by 39% of the web servers, versus 21.9% being used by Microsoft Windows.40.1% used other types of Unix.
+
+
+IDC's Q1 2007 report indicated that Linux held 12.7% of the overall server market at that time; this estimate was based on the number of Linux servers sold by various companies, and did not include server hardware purchased separately that had Linux installed on it later.
+
+
+Mobile devices
+Android, which is based on the Linux kernel, has become the dominant operating system for smartphones.
+
+In April 2023, 68.61% of mobile devices accessing websites using StatCounter were from Android.
+
+Android is also a popular operating system for tablets, being responsible for more than 60% of tablet sales as of 2013.
+
+According to web server statistics, as of October 2021 Android has a market share of about 71%, with iOS holding 28%, and the remaining 1% attributed to various niche platforms.
+
+
+Film production
+For years Linux has been the platform of choice in the film industry.
+
+The first major film produced on Linux servers was 1997's Titanic.
+
+Since then major studios including DreamWorks Animation, Pixar, Weta Digital, and Industrial Light & Magic have migrated to Linux.
+
+According to the Linux Movies Group, more than 95% of the servers and desktops at large animation and visual effects companies use Linux.
+
+
+Use in government
+Linux distributions have also gained popularity with various local and national governments.
+
+News of the Russian military creating its own Linux distribution has also surfaced, and has come to fruition as the G.H.ost Project.
+
+The Indian state of Kerala has gone to the extent of mandating that all state high schools run Linux on their computers.
+
+China uses Linux exclusively as the operating system for its Loongson processor family to achieve technology independence.
+
+In Spain, some regions have developed their own Linux distributions, which are widely used in education and official institutions, like gnuLinEx in Extremadura and Guadalinex in Andalusia.
+
+France and Germany have also taken steps toward the adoption of Linux.
+
+North Korea's Red Star OS, developed since 2002, is based on a version of Fedora Linux.
+
+
+Copyright, trademark, and naming
+See also: GNU/Linux naming controversy and SCO–Linux disputes
+The Linux kernel is licensed under the GNU General Public License (GPL), version 2.
+
+The GPL requires that anyone who distributes software based on source code under this license must make the originating source code (and any modifications) available to the recipient under the same terms.
+
+Other key components of a typical Linux distribution are also mainly licensed under the GPL, but they may use other licenses; many libraries use the GNU Lesser General Public License (LGPL), a more permissive variant of the GPL, and the X.Org implementation of the X Window System uses the MIT License.
+
+
+
+Torvalds states that the Linux kernel will not move from version 2 of the GPL to version 3.
+
+He specifically dislikes some provisions in the new license which prohibit the use of the software in digital rights management.
+
+It would also be impractical to obtain permission from all the copyright holders, who number in the thousands.
+
+
+
+A 2001 study of Red Hat Linux 7.1 found that this distribution contained 30 million source lines of code.
+
+Using the Constructive Cost Model, the study estimated that this distribution required about eight thousand person-years of development time.
+
+According to the study, if all this software had been developed by conventional proprietary means, it would have cost about US$1.64 billion to develop in 2021 in the United States.
+
+Most of the source code (71%) was written in the C programming language, but many other languages were used, including C++, Lisp, assembly language, Perl, Python, Fortran, and various shell scripting languages.
+
+Slightly over half of all lines of code were licensed under the GPL.The Linux kernel itself was 2.4 million lines of code, or 8% of the total.
+
+
+
+In a later study, the same analysis was performed for Debian version 4.0 (etch, which was released in 2007).
+
+This distribution contained close to 283 million source lines of code, and the study estimated that it would have required about seventy three thousand man-years and cost US$9.16 billion (in 2021 dollars) to develop by conventional means.
+
+
+
+
+
+The name "Linux" is also used for a laundry detergent made by Swiss company Rösch.
+
+
+In the United States, the name Linux is a trademark registered to Linus Torvalds.
+
+Initially, nobody registered it, but on August 15, 1994, William R.Della Croce, Jr.filed for the trademark Linux, and then demanded royalties from Linux distributors.
+
+In 1996, Torvalds and some affected organizations sued him to have the trademark assigned to Torvalds, and, in 1997, the case was settled.
+
+The licensing of the trademark has since been handled by the Linux Mark Institute (LMI).
+
+Torvalds has stated that he trademarked the name only to prevent someone else from using it.
+
+LMI originally charged a nominal sublicensing fee for use of the Linux name as part of trademarks, but later changed this in favor of offering a free, perpetual worldwide sublicense.
+
+
+
+The Free Software Foundation (FSF) prefers GNU/Linux as the name when referring to the operating system as a whole, because it considers Linux distributions to be variants of the GNU operating system initiated in 1983 by Richard Stallman, president of the FSF.They explicitly take no issue over the name Android for the Android OS, which is also an operating system based on the Linux kernel, as GNU is not a part of it.
+
+
+
+A minority of public figures and software projects other than Stallman and the FSF, notably Debian (which had been sponsored by the FSF up to 1996), also use GNU/Linux when referring to the operating system as a whole.
+
+Most media and common usage, however, refers to this family of operating systems simply as Linux, as do many large Linux distributions (for example, SUSE Linux and Red Hat Enterprise Linux).
+
+By contrast, Linux distributions containing only free software use "GNU/Linux" or simply "GNU", such as Trisquel GNU/Linux, Parabola GNU/Linux-libre, BLAG Linux and GNU, and gNewSense.
+
+
+
+As of May 2011, about 8% to 13% of the lines of code of the Linux distribution Ubuntu (version "Natty") is made of GNU components (the range depending on whether GNOME is considered part of GNU); meanwhile, 6% is taken by the Linux kernel, increased to 9% when including its direct dependencies.
 
