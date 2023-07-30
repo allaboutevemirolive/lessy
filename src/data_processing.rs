@@ -35,26 +35,41 @@ pub fn delete_specific_words(data: &str, words_to_be_deleted: &[&str]) -> String
     let mut new_data = String::new();
     let lines: Vec<&str> = data.split('\n').collect();
 
-    // let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
-
-    let pattern = words_to_be_deleted
-        .iter()
-        .map(|word| format!(r"\b{}\b", regex::escape(word)))
-        .collect::<Vec<String>>()
-        .join("|");
-
-    let re_words = Regex::new(&pattern).unwrap();
+    let re_words = Regex::new(&format!(r"({})", words_to_be_deleted.join("|"))).unwrap();
 
     for line in lines {
-        // Cleaning line from pattern
+        let mut modified_line = String::new();
         let line_without_brackets = re_words.replace_all(line, "");
 
-        // Cow => &str
-        new_data.push_str(&line_without_brackets.to_string());
-        // new_data.push_str("\n");
+        for word in line_without_brackets.split(' ') {
+            modified_line.push_str(word);
+            modified_line.push(' ');
+        }
+
+        modified_line.pop();
+
+        new_data.push_str(&modified_line);
+        new_data.push('\n');
+
+        // BAD DESIGN
+
+        // let pattern = words_to_be_deleted
+        //     .iter()
+        //     .map(|word| format!(r"\b{}\b", regex::escape(word)))
+        //     .collect::<Vec<String>>()
+        //     .join("|");
+
+        // let re_words = Regex::new(&pattern).unwrap();
+
+        // for line in lines {
+        //     // Cleaning line from pattern
+        //     let line_without_brackets = re_words.replace_all(line, "");
+
+        //     // Cow => &str
+        //     new_data.push_str(&line_without_brackets.to_string());
+        //     // new_data.push_str("\n");
     }
 
-    // Remove trailing whitespace and extra space before newline
     new_data = new_data.to_string();
 
     new_data
@@ -66,6 +81,11 @@ pub fn process_data(
     text_to_be_replaced: &str,
     words_to_delete: &[&str],
 ) -> Result<String, Box<dyn std::error::Error>> {
+    // TODO: Potential error process text
+    // Bad design?
+    // We cannot invoke this function in else if c, blow
+    // because we want all item should be scan first
+    // so there is not missed item
     let data = delete_specific_words(&data, &words_to_delete);
     let data = delete_entire_line(&data, &text_to_be_replaced);
 
