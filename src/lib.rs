@@ -1,5 +1,6 @@
 pub mod data_processing;
 pub mod file_utils;
+mod test_module;
 
 use data_processing::{insert_blank_spaces, process_data};
 use file_utils::{format_file_name, format_output_file_name, read_input_file, write_output_file};
