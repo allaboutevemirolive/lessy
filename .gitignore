@@ -17,3 +17,8 @@ output/
 experiment/
 references/
 code_explanation/
+
+
+# Added by cargo
+
+/target

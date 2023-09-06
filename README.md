@@ -27,7 +27,3 @@ This project is licensed under the [MIT License](LICENSE).
 
 Lessy was inspired by the need for text processing tools in various projects. We thank the open-source community for their contributions and the Rust programming language for providing a robust and efficient platform for building such tools.
 
-## Contact
-
-For any inquiries or questions, please contact us at [akmal.fir010@gmail.com](akmal.fir010@gmail.com).
-
