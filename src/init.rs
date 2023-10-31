@@ -29,9 +29,8 @@ impl<'a> Initializer<'a> {
 
 impl<'a> MainInitializer for Initializer<'a> {
     fn run_init(&self) -> Result<(), Box<dyn std::error::Error>> {
-
         let input_file = &self.input_output.get_input();
-        let main_text = FileManager::input_reader(&input_file)?;
+        let main_text = FileManager::input_reader(input_file)?;
 
         let text_to_be_replaced = &self.text_to_be_replaced;
 

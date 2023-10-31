@@ -3,10 +3,7 @@ use std::io::{BufReader, BufWriter, Read, Write};
 
 pub trait FileWriter {
     fn input_reader(input_file: &str) -> Result<String, Box<dyn std::error::Error>>;
-    fn output_writer(
-        output_file: &String,
-        new_text: &str,
-    ) -> Result<(), Box<dyn std::error::Error>>;
+    fn output_writer(output_file: &str, new_text: &str) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 pub struct FileManager {
@@ -40,10 +37,7 @@ impl FileWriter for FileManager {
         Ok(data)
     }
 
-    fn output_writer(
-        output_file: &String,
-        new_text: &str,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn output_writer(output_file: &str, new_text: &str) -> Result<(), Box<dyn std::error::Error>> {
         let file = File::create(output_file)?;
         let mut buf_writer = BufWriter::new(file);
         buf_writer.write_all(new_text.as_bytes())?;

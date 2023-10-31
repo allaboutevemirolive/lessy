@@ -63,7 +63,7 @@ impl Manipulator for TextProcessor {
         let mut new_data = String::new();
 
         for line in data.lines() {
-            if line.find(text_to_be_deleted).is_none() {
+            if !line.contains(text_to_be_deleted) {
                 new_data += line;
                 new_data.push('\n');
             }
@@ -112,11 +112,16 @@ impl Manipulator for TextProcessor {
     /// - for current dot sign, if the char before and after it is Uppercase. E.g "S.R/M.R"
     /// - A list of word that should not be format by the code since it has meaning in it.
     fn after_dot_sign(next_char: char, new_text: &mut String, prev_char: char) {
-        if !next_char.is_lowercase()
-            && !next_char.is_digit(10)
-            && next_char != '.'
-            && !Self::is_symbol(next_char)
-            && !(prev_char.is_uppercase() && next_char.is_uppercase())
+        // if !next_char.is_lowercase()
+        //     && !next_char.is_digit(10)
+        //     && next_char != '.'
+        //     && !Self::is_symbol(next_char)
+        //     && !(prev_char.is_uppercase() && next_char.is_uppercase())
+        if !(next_char.is_lowercase()
+            || next_char.is_ascii_digit()
+            || next_char == '.'
+            || Self::is_symbol(next_char)
+            || prev_char.is_uppercase() && next_char.is_uppercase())
         {
             new_text.push('\n');
             new_text.push('\n');
@@ -156,15 +161,15 @@ impl ProcessData for TextProcessor {
             // and close curly braces, do not format it.
             // Probably it is snippet
             match char {
-                '{' if (self.skip_code == true) => {
+                '{' if self.skip_code => {
                     inside_braces = true;
                     new_text.push(char);
                 }
-                '}' if (self.skip_code == true) => {
+                '}' if self.skip_code => {
                     inside_braces = false;
                     new_text.push(char);
                 }
-                _ if inside_braces == false => {
+                _ if !inside_braces => {
                     if char == '.' {
                         new_text.push('.');
 

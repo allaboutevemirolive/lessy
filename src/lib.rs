@@ -5,7 +5,6 @@ use init::*;
 use util::FileManager;
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-
     let text_to_be_replaced = "Click here to view code image";
     let words_to_delete = vec![r#"\[[0-9]+\]"#];
     let file_manager = FileManager::new("input.txt", "output.md");
