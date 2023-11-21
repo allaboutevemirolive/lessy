@@ -1,0 +1,201 @@
+use std::collections::HashSet;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::error::Error;
+use std::os::unix::fs::MetadataExt;
+use std::io;
+
+struct Totals {
+    dirs: usize,
+    files: usize,
+    size: u64,
+}
+
+// #[derive(Eq, Hash, PartialEq)]
+// struct InodeInfo {
+//     inode_number: u64,
+//     device_id: u64,
+// }
+
+// struct InodeTable {
+//     unique_entries: HashSet<InodeInfo>,
+// }
+
+// impl InodeTable {
+//     fn new() -> Self {
+//         InodeTable {
+//             unique_entries: HashSet::new(),
+//         }
+//     }
+
+//     fn save_inode_info(&mut self, inode_number: u64, device_id: u64) {
+//         let info = InodeInfo {
+//             inode_number,
+//             device_id,
+//         };
+//         if !self.unique_entries.contains(&info) {
+//             self.unique_entries.insert(info);
+//         }
+//     }
+// }
+
+// struct PathEntries {
+//     entries: Vec<PathBuf>,
+// }
+
+// impl PathEntries {
+//     fn new() -> Self {
+//         PathEntries { entries: Vec::new() }
+//     }
+
+//     fn add_entry(&mut self, entry: PathBuf) {
+//         self.entries.push(entry);
+//     }
+
+//     fn generate_tree(&self, base_dir: &str) {
+//         let mut tree: Vec<String> = Vec::new();
+//         for entry in &self.entries {
+//             let entry_path = entry.display().to_string();
+//             let trimmed_path = entry_path.trim_start_matches(base_dir);
+//             tree.push(trimmed_path.to_string());
+//         }
+
+//         let root = Path::new(base_dir);
+//         self.print_tree(&tree, root, "");
+//     }
+
+//     fn print_tree(&self, tree: &[String], parent: &Path, indent: &str) {
+//         for (index, item) in tree.iter().enumerate() {
+//             let path = parent.join(Path::new(item));
+//             if index == tree.len() - 1 {
+//                 println!("{}└── {}", indent, item);
+//             } else {
+//                 println!("{}├── {}", indent, item);
+//             }
+//             if path.is_dir() {
+//                 let mut subtree: Vec<String> = Vec::new();
+//                 for entry in &self.entries {
+//                     let entry_path = entry.display().to_string();
+//                     let trimmed_path = entry_path.trim_start_matches(path.to_str().unwrap());
+//                     if trimmed_path.starts_with('/') {
+//                         subtree.push(trimmed_path.to_string());
+//                     }
+//                 }
+//                 self.print_tree(&subtree, &path, &format!("{}{}", indent, "│   "));
+//             }
+//         }
+//     }
+// }
+
+// fn list_dir<P: AsRef<Path>>(
+//     dirname: P,
+//     inode_table: &mut InodeTable,
+//     path_entries: &mut PathEntries,
+// ) -> Result<Totals, Box<dyn Error>> {
+//     let mut totals = Totals {
+//         dirs: 0,
+//         files: 0,
+//         size: 0,
+//     };
+//     let dir = fs::read_dir(dirname)?;
+
+//     for entry in dir {
+//         let entry = entry?;
+//         let path = entry.path().canonicalize()?; // Use canonicalized path for accuracy
+//         let file_name = entry.file_name().to_string_lossy().into_owned();
+
+//         // Accumulate all path in target dir
+//         path_entries.add_entry(path.clone());
+
+//         // if path.is_dir() {
+//         //     totals.dirs += 1;
+//         // } else {
+//         //     totals.files += 1;
+//         // }
+
+//         // Fetch metadata for the file
+//         if let Ok(metadata) = entry.metadata() {
+//             totals.size += metadata.len();
+//             if path.is_dir() {
+//                 totals.dirs += 1;
+//             } else {
+//                 totals.files += 1;
+//             }
+//             inode_table.save_inode_info(metadata.ino(), metadata.dev());
+//         }
+//     }
+
+//     Ok(totals)
+// }
+
+fn walk(dir: &str, prefix: &str, counts: &mut Totals) -> io::Result<()> {
+    let mut paths: Vec<_> = fs::read_dir(dir)?
+        .map(|entry| entry.unwrap().path())
+        .collect();
+    let mut index = paths.len();
+
+    paths.sort_by(|a, b| {
+        let aname = a.file_name().unwrap().to_str().unwrap();
+        let bname = b.file_name().unwrap().to_str().unwrap();
+        aname.cmp(bname)
+    });
+
+    for path in paths {
+        let name = path.file_name().unwrap().to_str().unwrap();
+        index -= 1;
+
+        if index == 0 {
+            println!("{}└── {}", prefix, name);
+            if path.is_dir() {
+                walk(
+                    &format!("{}/{}", dir, name),
+                    &format!("{}    ", prefix),
+                    counts,
+                )?;
+            }
+        } else {
+            println!("{}├── {}", prefix, name);
+            if path.is_dir() {
+                walk(
+                    &format!("{}/{}", dir, name),
+                    &format!("{}│   ", prefix),
+                    counts,
+                )?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let dirname = "/home/nemesis/Documents/Github/test/trie"; // Replace with the desired directory path
+
+    // let mut inode_table = InodeTable::new();
+    // // let mut path_entries = PathEntries::new(); // Create a PathEntries instance
+
+    let mut counts = Totals {
+        dirs: 0,
+        files: 0,
+        size: 0,
+    };
+
+    walk(&dirname, "", &mut counts)?;
+    // let totals = list_dir(&dirname, &mut inode_table, &mut path_entries)?;
+
+    // let base_dir = Path::new(&dirname).canonicalize()?.display().to_string(); // Get the canonicalized base directory path
+
+    println!("=========================================================");
+    // println!("All Path Entries:");
+
+    // path_entries.generate_tree(&base_dir);
+
+    // println!("");
+
+    println!("=========================================================");
+    // println!("Total Directories: {}", totals.dirs);
+    // println!("Total Files: {}", totals.files);
+    // println!("Total Size: {} bytes", totals.size);
+
+    Ok(())
+}
